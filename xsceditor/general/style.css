@@ -1,0 +1,1149 @@
+/*This style document contains styles, mostly button styles, for Hairy MineFart's XSC Viewer */
+
+table {
+-webkit-box-shadow: 8px 8px 4px 0px rgba(0,0,0,0.67);
+-moz-box-shadow: 8px 8px 4px 0px rgba(0,0,0,0.67);
+box-shadow: 8px 8px 4px 0px rgba(0,0,0,0.67);
+border-radius: 20px 20px 20px 20px;
+-moz-border-radius: 20px 20px 20px 20px;
+-webkit-border-radius: 20px 20px 20px 20px;
+border: 0px solid #000000;
+}
+
+body{height:98%;
+   width:99%;
+   background-image:url(background.jpg);/*your background image*/  
+   background-repeat:repeat-y;/*we want to have one single image not a repeated one*/  
+   background-size:cover;/*this sets the image to fullscreen covering the whole screen*/  
+   /*css hack for ie*/     
+   filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='.background.jpg',sizingMethod='scale');
+   -ms-filter:"progid:DXImageTransform.Microsoft.AlphaImageLoader(src='background.jpg',sizingMethod='scale')";
+}
+
+#control_panel_cell{ /* Just a few small things for the control panel */
+	padding-top:50px;
+	padding-bottom:50px;
+	padding-right:50px;
+	padding-left:50px;
+}
+
+/*  This is the config for the divs used by the upload script - this section makes the two float side by side */
+#wrapper {
+	
+    width: 50%;
+	height: 30%;
+    border: none;
+    overflow: hidden; /* will contain if #first is longer than #second */
+	
+	padding-top:0px;
+	padding-bottom:100px;
+	padding-right:100px;
+	padding-left:100px;
+}
+#first {
+    width: 25%px;
+	float:left; /* add this */
+    border-right: 1px solid black;
+	background-image:url(table_bg.jpg);
+	
+	padding-top:100px;
+	padding-bottom:100px;
+	padding-right:100px;
+	padding-left:100px;
+}
+#second {
+	width: 15%px;
+    border-left: 1px solid black;
+	float:left;
+    /*overflow: hidden;  if you don't want #second to wrap below #first */
+	background-image:url(table_bg.jpg);
+	
+	padding-top:100px;
+	padding-bottom:100px;
+	padding-right:100px;
+	padding-left:100px;
+}
+
+
+
+
+#custom {
+    width: 20%px;
+	float:left; /* add this */
+    border-right: 1px solid black;
+	background-image:url(table_bg.jpg);
+	
+	padding-top:50px;
+	padding-bottom:150px;
+	padding-right:100px;
+	padding-left:100px;
+}
+#custom2 {
+    width: 20%px;
+	float:left; /* add this */
+    border-right: 1px solid black;
+	background-image:url(table_bg.jpg);
+	
+	padding-top:50px;
+	padding-bottom:100px;
+	padding-right:100px;
+	padding-left:100px;
+}
+#wrapper2 {
+    width: 20%;
+	height: 30%;
+    border: none;
+    overflow: hidden; /* will contain if #first is longer than #second */
+	
+	padding-top:0px;
+	padding-bottom:100px;
+	padding-right:100px;
+	padding-left:100px;
+}
+
+
+
+
+
+
+/*  Upload button found in XSC upload page. Orange Upload button. */
+
+
+.button_upload {
+	-moz-box-shadow:inset 0px 0px 0px 0px #fce2c1;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #fce2c1;
+	box-shadow:inset 0px 0px 0px 0px #fce2c1;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ffc477), color-stop(1, #fb9e25) );
+	background:-moz-linear-gradient( center top, #ffc477 5%, #fb9e25 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffc477', endColorstr='#fb9e25');
+	background-color:#ffc477;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0px;
+	border:1px solid #eeb44f;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:40px;
+	line-height:40px;
+	width:130px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:0px -2px 0px #cc9f52;
+}
+.button_upload:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fb9e25), color-stop(1, #ffc477) );
+	background:-moz-linear-gradient( center top, #fb9e25 5%, #ffc477 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fb9e25', endColorstr='#ffc477');
+	background-color:#fb9e25;
+}.button_upload:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+
+
+
+/*  Create New XSC button found in file upload page. Blue Create New XSC button. */
+
+
+.button_create_new {
+	-moz-box-shadow:inset 0px 0px 0px 0px #97c4fe;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #97c4fe;
+	box-shadow:inset 0px 0px 0px 0px #97c4fe;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #3d94f6), color-stop(1, #1e62d0) );
+	background:-moz-linear-gradient( center top, #3d94f6 5%, #1e62d0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#3d94f6', endColorstr='#1e62d0');
+	background-color:#3d94f6;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0px;
+	border:1px solid #337fed;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:40px;
+	line-height:40px;
+	width:130px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:0px -2px 0px #1570cd;
+}
+.button_create_new:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1e62d0), color-stop(1, #3d94f6) );
+	background:-moz-linear-gradient( center top, #1e62d0 5%, #3d94f6 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1e62d0', endColorstr='#3d94f6');
+	background-color:#1e62d0;
+}.button_create_new:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+
+
+
+/*  Choose Another button. After you upload a XSC to the temp folder, it'll ask if you're sure you want to upload before viewing the XSC. Red Choose Another button */
+
+
+.button_choose_another {
+	-moz-box-shadow:inset 0px 0px 0px 0px #f29c93;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #f29c93;
+	box-shadow:inset 0px 0px 0px 0px #f29c93;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fe1a00), color-stop(1, #ce0100) );
+	background:-moz-linear-gradient( center top, #fe1a00 5%, #ce0100 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fe1a00', endColorstr='#ce0100');
+	background-color:#fe1a00;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0px;
+	border:1px solid #d83526;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:55px;
+	line-height:55px;
+	width:158px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:0px -2px 0px #b23e35;
+}
+.button_choose_another:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ce0100), color-stop(1, #fe1a00) );
+	background:-moz-linear-gradient( center top, #ce0100 5%, #fe1a00 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ce0100', endColorstr='#fe1a00');
+	background-color:#ce0100;
+}.button_choose_another:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+/*  Continue button. This can really be used by anything. Green continue button */
+
+
+.button_continue {
+	-moz-box-shadow:inset 0px 0px 0px 0px #c1ed9c;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #c1ed9c;
+	box-shadow:inset 0px 0px 0px 0px #c1ed9c;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #9dce2c), color-stop(1, #8cb82b) );
+	background:-moz-linear-gradient( center top, #9dce2c 5%, #8cb82b 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#9dce2c', endColorstr='#8cb82b');
+	background-color:#9dce2c;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0px;
+	border:1px solid #83c41a;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:55px;
+	line-height:55px;
+	width:158px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:0px -2px 0px #689324;
+}
+.button_continue:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #8cb82b), color-stop(1, #9dce2c) );
+	background:-moz-linear-gradient( center top, #8cb82b 5%, #9dce2c 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8cb82b', endColorstr='#9dce2c');
+	background-color:#8cb82b;
+}.button_continue:active {
+	position:relative;
+	top:1px;
+}
+
+
+/*  Open XSC Viewer Button. Once XSC is uploaded, use this button to open the viewer. Blue Open XSC Viewer button */
+
+
+.button_open_viewer {
+	-moz-box-shadow:inset 0px 0px 0px 0px #97c4fe;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #97c4fe;
+	box-shadow:inset 0px 0px 0px 0px #97c4fe;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #3d94f6), color-stop(1, #1e62d0) );
+	background:-moz-linear-gradient( center top, #3d94f6 5%, #1e62d0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#3d94f6', endColorstr='#1e62d0');
+	background-color:#3d94f6;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0px;
+	border:1px solid #337fed;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:55px;
+	line-height:55px;
+	width:158px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:0px -2px 0px #1570cd;
+}
+.button_open_viewer:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1e62d0), color-stop(1, #3d94f6) );
+	background:-moz-linear-gradient( center top, #1e62d0 5%, #3d94f6 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1e62d0', endColorstr='#3d94f6');
+	background-color:#1e62d0;
+}.button_open_viewer:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+/*  Pink Open Editor Button. You can View or Edit an XSC. This is for Editing. */
+
+.button_open_editor {
+	-moz-box-shadow:inset 0px 0px 0px 0px #fbafe3;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #fbafe3;
+	box-shadow:inset 0px 0px 0px 0px #fbafe3;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ff5bb0), color-stop(1, #ef027d) );
+	background:-moz-linear-gradient( center top, #ff5bb0 5%, #ef027d 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bb0', endColorstr='#ef027d');
+	background-color:#ff5bb0;
+	-webkit-border-top-left-radius:42px;
+	-moz-border-radius-topleft:42px;
+	border-top-left-radius:42px;
+	-webkit-border-top-right-radius:42px;
+	-moz-border-radius-topright:42px;
+	border-top-right-radius:42px;
+	-webkit-border-bottom-right-radius:42px;
+	-moz-border-radius-bottomright:42px;
+	border-bottom-right-radius:42px;
+	-webkit-border-bottom-left-radius:42px;
+	-moz-border-radius-bottomleft:42px;
+	border-bottom-left-radius:42px;
+	text-indent:0;
+	border:1px solid #ee1eb5;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	height:43px;
+	line-height:43px;
+	width:152px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px -2px 0px #c70067;
+}
+.button_open_editor:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ef027d), color-stop(1, #ff5bb0) );
+	background:-moz-linear-gradient( center top, #ef027d 5%, #ff5bb0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef027d', endColorstr='#ff5bb0');
+	background-color:#ef027d;
+}.button_open_editor:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+/*  Delete Button. This appears mainly on the XSC Upload Manager script. Red Delete button.  */
+
+
+.button_delete {
+	-moz-box-shadow:inset 0px 0px 0px 0px #f29c93;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #f29c93;
+	box-shadow:inset 0px 0px 0px 0px #f29c93;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fe1a00), color-stop(1, #ce0100) );
+	background:-moz-linear-gradient( center top, #fe1a00 5%, #ce0100 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fe1a00', endColorstr='#ce0100');
+	background-color:#fe1a00;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0px;
+	border:1px solid #d83526;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:27px;
+	line-height:27px;
+	width:125px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:0px -2px 0px #b23e35;
+}
+.button_delete:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ce0100), color-stop(1, #fe1a00) );
+	background:-moz-linear-gradient( center top, #ce0100 5%, #fe1a00 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ce0100', endColorstr='#fe1a00');
+	background-color:#ce0100;
+}.button_delete:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+
+
+/* Light Blue button - says Open in Viewer. Used in Uploads Manager page*/
+
+
+.button_open_in_viewer {
+	-moz-box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	box-shadow:inset 0px 1px 0px 0px #97c4fe;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #3d94f6), color-stop(1, #1e62d0) );
+	background:-moz-linear-gradient( center top, #3d94f6 5%, #1e62d0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#3d94f6', endColorstr='#1e62d0');
+	background-color:#3d94f6;
+	-webkit-border-top-left-radius:6px;
+	-moz-border-radius-topleft:6px;
+	border-top-left-radius:6px;
+	-webkit-border-top-right-radius:6px;
+	-moz-border-radius-topright:6px;
+	border-top-right-radius:6px;
+	-webkit-border-bottom-right-radius:6px;
+	-moz-border-radius-bottomright:6px;
+	border-bottom-right-radius:6px;
+	-webkit-border-bottom-left-radius:6px;
+	-moz-border-radius-bottomleft:6px;
+	border-bottom-left-radius:6px;
+	text-indent:0;
+	border:1px solid #337fed;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	height:26px;
+	line-height:26px;
+	width:130px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px -2px 0px #1570cd;
+}
+.button_open_in_viewer:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #1e62d0), color-stop(1, #3d94f6) );
+	background:-moz-linear-gradient( center top, #1e62d0 5%, #3d94f6 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#1e62d0', endColorstr='#3d94f6');
+	background-color:#1e62d0;
+}.button_open_in_viewer:active {
+	position:relative;
+	top:1px;
+}
+
+
+/* Open in Editor button - pink button appears on XSC Uploads Manager  */
+
+.button_open_in_editor {
+	-moz-box-shadow:inset 0px 0px 0px 0px #fbafe3;
+	-webkit-box-shadow:inset 0px 0px 0px 0px #fbafe3;
+	box-shadow:inset 0px 0px 0px 0px #fbafe3;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ff5bb0), color-stop(1, #ef027d) );
+	background:-moz-linear-gradient( center top, #ff5bb0 5%, #ef027d 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bb0', endColorstr='#ef027d');
+	background-color:#ff5bb0;
+	-webkit-border-top-left-radius:15px;
+	-moz-border-radius-topleft:15px;
+	border-top-left-radius:15px;
+	-webkit-border-top-right-radius:15px;
+	-moz-border-radius-topright:15px;
+	border-top-right-radius:15px;
+	-webkit-border-bottom-right-radius:15px;
+	-moz-border-radius-bottomright:15px;
+	border-bottom-right-radius:15px;
+	-webkit-border-bottom-left-radius:15px;
+	-moz-border-radius-bottomleft:15px;
+	border-bottom-left-radius:15px;
+	text-indent:0;
+	border:1px solid #ee1eb5;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	height:31px;
+	line-height:31px;
+	width:138px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px -2px 0px #c70067;
+}
+.button_open_in_editor:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ef027d), color-stop(1, #ff5bb0) );
+	background:-moz-linear-gradient( center top, #ef027d 5%, #ff5bb0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef027d', endColorstr='#ff5bb0');
+	background-color:#ef027d;
+}.button_open_in_editor:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+
+/* Button on index.php main page used to select from already uploaded XSC files */
+
+.button_select_from_uploads {
+	-moz-box-shadow:inset 0px 1px 0px 0px #d197fe;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #d197fe;
+	box-shadow:inset 0px 1px 0px 0px #d197fe;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #a53df6), color-stop(1, #7c16cb) );
+	background:-moz-linear-gradient( center top, #a53df6 5%, #7c16cb 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#a53df6', endColorstr='#7c16cb');
+	background-color:#a53df6;
+	-webkit-border-top-left-radius:19px;
+	-moz-border-radius-topleft:19px;
+	border-top-left-radius:19px;
+	-webkit-border-top-right-radius:19px;
+	-moz-border-radius-topright:19px;
+	border-top-right-radius:19px;
+	-webkit-border-bottom-right-radius:19px;
+	-moz-border-radius-bottomright:19px;
+	border-bottom-right-radius:19px;
+	-webkit-border-bottom-left-radius:19px;
+	-moz-border-radius-bottomleft:19px;
+	border-bottom-left-radius:19px;
+	text-indent:0;
+	border:1px solid #9c33ed;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	height:37px;
+	line-height:37px;
+	width:167px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px -2px 0px #7d15cd;
+}
+.button_select_from_uploads:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #7c16cb), color-stop(1, #a53df6) );
+	background:-moz-linear-gradient( center top, #7c16cb 5%, #a53df6 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#7c16cb', endColorstr='#a53df6');
+	background-color:#7c16cb;
+}.button_select_from_uploads:active {
+	position:relative;
+	top:1px;
+}
+
+
+/*Next three buttons are on the control panel at top of each page */
+
+/* Orange "Main" button found at control panel at top of page */
+.button_cp_main {
+	-moz-box-shadow:inset 0px 1px 0px 0px #fed897;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #fed897;
+	box-shadow:inset 0px 1px 0px 0px #fed897;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #f6b33d), color-stop(1, #d29105) );
+	background:-moz-linear-gradient( center top, #f6b33d 5%, #d29105 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f6b33d', endColorstr='#d29105');
+	background-color:#f6b33d;
+	-webkit-border-top-left-radius:42px;
+	-moz-border-radius-topleft:42px;
+	border-top-left-radius:42px;
+	-webkit-border-top-right-radius:42px;
+	-moz-border-radius-topright:42px;
+	border-top-right-radius:42px;
+	-webkit-border-bottom-right-radius:42px;
+	-moz-border-radius-bottomright:42px;
+	border-bottom-right-radius:42px;
+	-webkit-border-bottom-left-radius:42px;
+	-moz-border-radius-bottomleft:42px;
+	border-bottom-left-radius:42px;
+	text-indent:0;
+	border:1px solid #eda933;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Comic Sans MS;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:48px;
+	line-height:48px;
+	width:150px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #cd8a15;
+}
+.button_cp_main:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #d29105), color-stop(1, #f6b33d) );
+	background:-moz-linear-gradient( center top, #d29105 5%, #f6b33d 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#d29105', endColorstr='#f6b33d');
+	background-color:#d29105;
+}.button_cp_main:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+
+/* Purple "Uploads Manager" button at control panel at top of page */
+.button_cp_uploadsmanager {
+	-moz-box-shadow:inset 0px 1px 0px 0px #e184f3;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #e184f3;
+	box-shadow:inset 0px 1px 0px 0px #e184f3;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #c123de), color-stop(1, #a20dbd) );
+	background:-moz-linear-gradient( center top, #c123de 5%, #a20dbd 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#c123de', endColorstr='#a20dbd');
+	background-color:#c123de;
+	-webkit-border-top-left-radius:42px;
+	-moz-border-radius-topleft:42px;
+	border-top-left-radius:42px;
+	-webkit-border-top-right-radius:42px;
+	-moz-border-radius-topright:42px;
+	border-top-right-radius:42px;
+	-webkit-border-bottom-right-radius:42px;
+	-moz-border-radius-bottomright:42px;
+	border-bottom-right-radius:42px;
+	-webkit-border-bottom-left-radius:42px;
+	-moz-border-radius-bottomleft:42px;
+	border-bottom-left-radius:42px;
+	text-indent:0;
+	border:1px solid #a511c0;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Comic Sans MS;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:48px;
+	line-height:48px;
+	width:166px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #9b14b3;
+}
+.button_cp_uploadsmanager:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #a20dbd), color-stop(1, #c123de) );
+	background:-moz-linear-gradient( center top, #a20dbd 5%, #c123de 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#a20dbd', endColorstr='#c123de');
+	background-color:#a20dbd;
+}.button_cp_uploadsmanager:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+
+/* Pink Log Viewer button at control panel at top of page */
+.button_cp_logviewer {
+	-moz-box-shadow:inset 0px 1px 0px 0px #fbafe3;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #fbafe3;
+	box-shadow:inset 0px 1px 0px 0px #fbafe3;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ff5bb0), color-stop(1, #ef027d) );
+	background:-moz-linear-gradient( center top, #ff5bb0 5%, #ef027d 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff5bb0', endColorstr='#ef027d');
+	background-color:#ff5bb0;
+	-webkit-border-top-left-radius:42px;
+	-moz-border-radius-topleft:42px;
+	border-top-left-radius:42px;
+	-webkit-border-top-right-radius:42px;
+	-moz-border-radius-topright:42px;
+	border-top-right-radius:42px;
+	-webkit-border-bottom-right-radius:42px;
+	-moz-border-radius-bottomright:42px;
+	border-bottom-right-radius:42px;
+	-webkit-border-bottom-left-radius:42px;
+	-moz-border-radius-bottomleft:42px;
+	border-bottom-left-radius:42px;
+	text-indent:0;
+	border:1px solid #ee1eb5;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Comic Sans MS;
+	font-size:17px;
+	font-weight:bold;
+	font-style:normal;
+	height:48px;
+	line-height:48px;
+	width:147px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #c70067;
+}
+.button_cp_logviewer:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ef027d), color-stop(1, #ff5bb0) );
+	background:-moz-linear-gradient( center top, #ef027d 5%, #ff5bb0 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ef027d', endColorstr='#ff5bb0');
+	background-color:#ef027d;
+}.button_cp_logviewer:active {
+	position:relative;
+	top:1px;
+}
+
+
+
+.button_compile {
+	-moz-box-shadow:inset 0px 1px 0px 0px #f4cafc;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #f4cafc;
+	box-shadow:inset 0px 1px 0px 0px #f4cafc;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #eea1fc), color-stop(1, #d441ee) );
+	background:-moz-linear-gradient( center top, #eea1fc 5%, #d441ee 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#eea1fc', endColorstr='#d441ee');
+	background-color:#eea1fc;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0;
+	border:1px solid #dd5df4;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:italic;
+	height:42px;
+	line-height:42px;
+	width:120px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px -2px 0px #b63dcc;
+}
+.button_compile:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #d441ee), color-stop(1, #eea1fc) );
+	background:-moz-linear-gradient( center top, #d441ee 5%, #eea1fc 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#d441ee', endColorstr='#eea1fc');
+	background-color:#d441ee;
+}.button_compile:active {
+	position:relative;
+	top:1px;
+}
+
+
+.button_compile_error {
+	-moz-box-shadow:inset 0px 1px 0px 0px #f29c93;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #f29c93;
+	box-shadow:inset 0px 1px 0px 0px #f29c93;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #fe1a00), color-stop(1, #ce0100) );
+	background:-moz-linear-gradient( center top, #fe1a00 5%, #ce0100 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fe1a00', endColorstr='#ce0100');
+	background-color:#fe1a00;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0;
+	border:1px solid #d83526;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	font-weight:bold;
+	font-style:italic;
+	height:42px;
+	line-height:42px;
+	width:120px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px -2px 0px #b23e35;
+}
+.button_compile_error:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ce0100), color-stop(1, #fe1a00) );
+	background:-moz-linear-gradient( center top, #ce0100 5%, #fe1a00 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ce0100', endColorstr='#fe1a00');
+	background-color:#ce0100;
+}.button_compile_error:active {
+	position:relative;
+	top:1px;
+}
+
+/* These buttons were generated using CSSButtonGenerator.com */
+
+
+
+
+
+
+
+
+
+
+
+
+/* NAVIGATION MENU CSS START */
+/* NAVIGATION MENU CSS START */
+/* NAVIGATION MENU CSS START */
+/* NAVIGATION MENU CSS START */
+/* ------------------------------------------------------------ *\
+|* ------------------------------------------------------------ *|
+|* Globals
+|* ------------------------------------------------------------ *|
+\* ------------------------------------------------------------ */
+button {
+    font-family: "Open Sans", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    border: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+/* ------------------------------------------------------------ *\
+|* ------------------------------------------------------------ *|
+|* Toggle Buttons
+|* ------------------------------------------------------------ *|
+\* ------------------------------------------------------------ */
+.buttons {
+    margin-bottom: 30px;
+    text-align: center;
+}
+.buttons button {
+    display: inline-block;
+    margin: 0 0 4px 0;
+    padding: 15px 30px;
+    color: #fff;
+    background-color: #67b5d1;
+}
+.buttons button:hover,
+.buttons button.active {
+    background-color: #3184a1
+}
+.buttons button:focus {
+    outline: none
+}
+/* ------------------------------------------------------------ *\
+|* ------------------------------------------------------------ *|
+|* Menus
+|* ------------------------------------------------------------ *|
+\* ------------------------------------------------------------ */
+/* general style for all menus */
+nav.menu {
+    position: fixed;
+    z-index: 20;
+    background-color: #67b5d1;
+    overflow: hidden;
+    -webkit-transition: all 0.3s;
+    -moz-transition: all 0.3s;
+    -ms-transition: all 0.3s;
+    -o-transition: all 0.3s;
+    transition: all 0.3s;
+}
+nav.menu ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+nav.menu a {
+    font-weight: 300;
+    color: #fff;
+}
+button.close-menu {
+    background-color: #3184a1;
+    color: #fff;
+}
+button.close-menu:focus {
+    outline: none
+}
+/* slide menu left and right, push menu left and right */
+nav.slide-menu-left,
+nav.slide-menu-right,
+nav.push-menu-left,
+nav.push-menu-right {
+    top: 0;
+    width: 300px;
+    height: 100%;
+}
+nav.slide-menu-left li,
+nav.slide-menu-right li,
+nav.push-menu-left li,
+nav.push-menu-right li {
+    display: block;
+    text-align: center;
+    border-bottom: solid 1px #3184a1;
+    border-top: solid 1px #b5dbe9;
+}
+nav.slide-menu-left li:first-child,
+nav.slide-menu-right li:first-child,
+nav.push-menu-left li:first-child,
+nav.push-menu-right li:first-child {
+    border-top: none
+}
+nav.slide-menu-left li:last-child,
+nav.slide-menu-right li:last-child,
+nav.push-menu-left li:last-child,
+nav.push-menu-right li:last-child {
+    border-bottom: none
+}
+nav.slide-menu-left a,
+nav.slide-menu-right a,
+nav.push-menu-left a,
+nav.push-menu-right a {
+    display: block;
+    padding: 10px;
+    font-size: 18px;
+}
+nav.slide-menu-left button.close-menu,
+nav.slide-menu-right button.close-menu,
+nav.push-menu-left button.close-menu,
+nav.push-menu-right button.close-menu {
+    margin: 10px 0;
+    padding: 10px 30px;
+    background-color: #3184a1;
+    color: #fff;
+}
+nav.slide-menu-left,
+nav.push-menu-left {
+    left: -300px
+}
+nav.slide-menu-right,
+nav.push-menu-right {
+    right: -300px
+}
+body.sml-open nav.slide-menu-left,
+body.pml-open nav.push-menu-left {
+    left: 0
+}
+body.smr-open nav.slide-menu-right,
+body.pmr-open nav.push-menu-right {
+    right: 0
+}
+body.pml-open #wrapper {
+    left: 300px
+}
+body.pmr-open #wrapper {
+    left: -300px
+}
+/* slide menu top and bottom */
+nav.slide-menu-top,
+nav.slide-menu-bottom,
+nav.push-menu-top,
+nav.push-menu-bottom {
+    left: 0;
+    width: 100%;
+    height: 100px;
+}
+nav.slide-menu-top ul,
+nav.slide-menu-bottom ul,
+nav.push-menu-top ul,
+nav.push-menu-bottom ul {
+    text-align: center;
+    padding: 25px 0 0 0;
+}
+nav.slide-menu-top li,
+nav.slide-menu-bottom li,
+nav.push-menu-top li,
+nav.push-menu-bottom li {
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+}
+nav.slide-menu-top a,
+nav.slide-menu-bottom a,
+nav.push-menu-top a,
+nav.push-menu-bottom a {
+    display: block;
+    line-height: 50px;
+    padding: 0 10px;
+    font-size: 18px;
+}
+nav.slide-menu-top button.close-menu,
+nav.slide-menu-bottom button.close-menu,
+nav.push-menu-top button.close-menu,
+nav.push-menu-bottom button.close-menu {
+    display: block;
+    line-height: 50px;
+    margin: 0;
+    padding: 0 10px;
+}
+nav.slide-menu-top,
+nav.push-menu-top {
+    top: -100px
+}
+nav.slide-menu-bottom,
+nav.push-menu-bottom {
+    bottom: -100px
+}
+body.smt-open nav.slide-menu-top,
+body.pmt-open nav.push-menu-top {
+    top: 0
+}
+body.smb-open nav.slide-menu-bottom,
+body.pmb-open nav.push-menu-bottom {
+    bottom: 0
+}
+body.pmt-open #wrapper {
+    top: 100px
+}
+body.pmb-open #wrapper {
+    top: -100px
+}
+/* ------------------------------------------------------------ *\
+|* ------------------------------------------------------------ *|
+|* Media Queries
+|* ------------------------------------------------------------ *|
+\* ------------------------------------------------------------ */
+@media all and (max-width: 860px) { 
+	.buttons br {
+	  	display: none
+	}
+	.buttons button {
+	  	padding: 10px 20px
+	}
+}
+@media all and (max-width: 660px) { 
+	/* slide menu top and bottom */
+	nav.slide-menu-top ul,
+	nav.slide-menu-bottom ul,
+	nav.push-menu-top ul,
+	nav.push-menu-bottom ul {
+	  	padding: 35px 0 0 0
+	}
+	nav.slide-menu-top a,
+	nav.slide-menu-bottom a,
+	nav.push-menu-top a,
+	nav.push-menu-bottom a {
+	  	line-height: 30px;
+	  	padding: 0 2px;
+	  	font-size: 12px;
+	}
+	nav.slide-menu-top button.close-menu,
+	nav.slide-menu-bottom button.close-menu,
+	nav.push-menu-top button.close-menu,
+	nav.push-menu-bottom button.close-menu {
+	  	line-height: 30px;
+	  	padding: 0 2px;
+	}
+}
+@media all and (max-width: 330px) { 
+	nav.slide-menu-left,
+	nav.slide-menu-right,
+	nav.push-menu-left,
+	nav.push-menu-right {
+	  	top: 0;
+	  	width: 100%;
+	}
+	nav.slide-menu-left,
+	nav.push-menu-left {
+	  	left: -100%
+	}
+	nav.slide-menu-right,
+	nav.push-menu-right {
+	  	right: -100%
+	}
+	body.sml-open nav.slide-menu-left,
+	body.pml-open nav.push-menu-left {
+	  	left: 0
+	}
+	body.smr-open nav.slide-menu-right,
+	body.pmr-open nav.push-menu-right {
+	  	right: 0
+	}
+	body.pml-open #wrapper {
+	  	left: 100%
+	}
+	body.pmr-open #wrapper {
+	  	left: -100%
+	}
+}
+
+/* NAVIGATION MENU CSS END */
+/* NAVIGATION MENU CSS END */
+/* NAVIGATION MENU CSS END */
+/* NAVIGATION MENU CSS END */
