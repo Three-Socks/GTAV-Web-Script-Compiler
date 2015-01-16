@@ -15,7 +15,7 @@ include 'viewer_functions.php';
 include 'opcode_switch.php';
 
 //The following function controls the entire decompiling process
-function Main($xsc_filename){
+function Main($xsc_filename, $ext){
 	$script_sections = array();
 	
 	$xsc_hex = Get_XSC_Hex($xsc_filename);  //Get hex from XSC
@@ -30,9 +30,14 @@ function Main($xsc_filename){
 	HTML_Script_Info_Section($HeaderValues);
 	free_memory();
 	flush();
-	HTML_Code_Section($script_sections, $HeaderValues); //Code parse and display
+	HTML_Code_Section($HeaderValues); //Code parse and display
+
+	ob_implicit_flush(true);
+	ob_end_flush();
+	parse_opcodes($script_sections, $HeaderValues['filename'], $ext);
 	free_memory();
 	flush();
+
 	HTML_Native_Section($script_sections, $HeaderValues, "general/RawNatives.txt", "general/RawHashes.txt"); //native parse/display
 	free_memory();
 	flush();

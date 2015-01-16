@@ -146,11 +146,6 @@ function handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string
 	$buffer = hexdec($stack) *2;
 	$ret[1] = $buffer;
 	
-	
-	//$string_block_array = explode("00", $string_sect);
-	//var_dump(Hex_to_Text($string_sect));
-	//var_dump($string_block_array);
-	//die();
 	for($i=0; $i<100; $i++){
 		$bytes[$i] = substr($string_sect, $buffer, 2);
 		if($bytes[$i] != '00'){
@@ -163,21 +158,11 @@ function handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string
 		break;
 	}
 	$ret[2] = $ret_string;
-	
-	//var_dump($ret);
-	//die();
-	
+		
 	return $ret; //$ret[0] is offset of push opcode, $ret[1] is offset pushed, $ret[2] is corresponding native
 }
 
-
-
-
-
-
-
-
-function parse_opcodes($script_sections){ 
+function parse_opcodes($script_sections, $filename, $ext){ 
 	$time_start = microtime(true);
 
 	$code_sect = $script_sections['code_sect'];
@@ -2003,27 +1988,35 @@ EOT;
 	
 	echo "Jump Call Offsets Count: " . count($jump_call_offsets) . "\n";*/
 	/* END DEBUG CODE */
-		
+
 	//Free up memory - helps a lot
 	unset($script_bytes);
 	$string_sect = null;
 	$code_sect = null;
 	$native_sect = null;
 	free_memory();
-	
-$time_end = microtime(true);
-$time = $time_end - $time_start;
-	
-//This ends the code parsing textarea
-HTML_Code_textarea($decompiled_output, $time);
 
-//create little textarea to display script errors
-if(!empty($script_errors)){
-	HTML_Errors($script_errors);
-}
+	$time_end = microtime(true);
+	$time = $time_end - $time_start;
 
-	
-return;
+	if (!empty($_POST['save_code']))
+	{
+		if ($ext == "csc")
+			$file_ext = ".csa";
+		else
+			$file_ext = ".xsa";
+
+		file_put_contents("code/" . $filename . $file_ext, $decompiled_output);
+			
+		HTML_Code_download("code/download.php?f=" . $filename . $file_ext, $time);
+	}
+	else
+		HTML_Code_textarea($decompiled_output, $time);
+
+	if (!empty($script_errors))
+		HTML_Errors($script_errors);
+
+	return;
 }
 
 

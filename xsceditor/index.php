@@ -21,7 +21,7 @@ if (isset($_FILES['upload_script'])
 		if (!empty($uploadfile))
 		{
 			include 'viewer/viewer.php';
-			Main($uploadfile);
+			Main($uploadfile, $ext);
 			exit;
 		}
 	}
