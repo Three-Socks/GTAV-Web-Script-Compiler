@@ -8,28 +8,6 @@ include 'theme/theme.php';
 
 $upload_error = '';
 
-function upload_file($file)
-{
-	global $upload_error;
-	
-	if ($file['size'] < 5242880)
-	{
-		//session_start();
-
-		//$converter_session = md5('xsceditor-' . session_id() . uniqid());
-		$uploaddir = 'xscuploads/';
-		//$uploadfile = $uploaddir . $converter_session . basename($file['name']);
-		$uploadfile = $uploaddir . basename($file['name']);
-
-		if (move_uploaded_file($file['tmp_name'], $uploadfile))
-			return $uploadfile;
-		else
-			$upload_error = 'Error uploading file.';
-	}
-	else
-		$upload_error = 'File too large. 5mb+.';
-}
-
 if (isset($_FILES['upload_script'])
  && empty($_FILES['upload_script']['error'])
  && !empty($_FILES['upload_script']['size']))
@@ -39,7 +17,7 @@ if (isset($_FILES['upload_script'])
 
 	if (in_array($ext,$allowed))
 	{
-		$uploadfile = upload_file($_FILES['upload_script']);
+		$uploadfile = $_FILES['upload_script']['tmp_name'];
 		if (!empty($uploadfile))
 		{
 			include 'viewer/viewer.php';
@@ -60,7 +38,7 @@ else if (isset($_FILES['upload_script_statics'])
 
 	if (in_array($ext,$allowed))
 	{
-		$uploadfile = upload_file($_FILES['upload_script_statics']);
+		$uploadfile = $_FILES['upload_script_statics']['tmp_name'];
 		if (!empty($uploadfile))
 		{
 			include 'compiler/gen_comp_functions.php';
@@ -91,7 +69,8 @@ else if (isset($_FILES['upload_code'])
 
 	if (in_array($ext,$allowed))
 	{
-		$uploadfile = upload_file($_FILES['upload_code']);
+		$uploadfile = $_FILES['upload_code']['tmp_name'];
+		$uploadfile_template = "";
 		if (!empty($uploadfile))
 		{
 			if (isset($_FILES['upload_script_template'])
@@ -102,59 +81,12 @@ else if (isset($_FILES['upload_code'])
 				$ext_template = pathinfo($_FILES['upload_script_template']['name'], PATHINFO_EXTENSION);
 				
 				if (in_array($ext_template,$allowed))
-					$uploadfile_template = upload_file($_FILES['upload_script_template']);
+					$uploadfile_template = $_FILES['upload_script_template']['tmp_name'];
 			}
 
-			include 'compiler/compiler_functions.php';
-			include 'compiler/gen_comp_functions.php';
-			include 'viewer/viewer_functions.php';
+			include 'compiler/compiler.php';
 
-			$statics_sect = array();
- 			
-			if (!empty($uploadfile_template))
-			{
-				$xsc_template_hex = Get_XSC_Hex($uploadfile_template);
-
-				$header = GetHeader($xsc_template_hex);  //Get Header
-				$HeaderValues = GetHeaderValues($header, $xsc_template_hex);
-				$statics_sect = Read_Statics_Section($HeaderValues, $xsc_template_hex);
-			}
-			
-			if (count($statics_sect) <= 1)
-			{
-				for ($i = 0; $i < 15; $i++)
-					$statics_sect[$i] = '00000000';
-			}
-
-			$raw_code = file_get_contents($uploadfile);
-
-			//split by lines
-			$raw_code = str_replace("\r\n", "\n", $raw_code);
-			$raw_code = bin2hex($raw_code);
-			//var_dump($raw_code);
-			$raw_code = str_replace("c2a0", "20", $raw_code);
-			$raw_code = hex2bin($raw_code);
-			//$raw_code = str_replace("", " ", $raw_code);
-			$lines = explode("\n", $raw_code);
-			$code_lines = array();
-
-			//throw each line into array newlines
-			//remove blank lines and comment lines
-			foreach($lines as $line)
-			{
-				if($line == "" || $line == "\r" || $line == "\n" || $line == "\r\n" || substr_count($line, "/") > 0)
-					continue;
-
-				$code_lines[] = $line;//$code_lines is lines of code
-			}
-
-			$xsc_final_filename = pathinfo($_FILES['upload_code']['name'], PATHINFO_FILENAME);
-			$xsc_final_filename = (strlen($xsc_final_filename) > 31) ? substr($xsc_final_filename,0, 31) : $xsc_final_filename;
-
-			//var_dump($code_lines);
-			//die();
-			
-			parse_code($code_lines, $statics_sect, $xsc_final_filename, $ext);
+			Main_compile($uploadfile, $uploadfile_template, $ext);
 			exit;
 		}
 	}
