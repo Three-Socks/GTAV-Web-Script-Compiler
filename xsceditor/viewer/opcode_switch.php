@@ -146,7 +146,12 @@ function handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string
 	$buffer = hexdec($stack) *2;
 	$ret[1] = $buffer;
 	
-	for($i=0; $i<50; $i++){
+	
+	//$string_block_array = explode("00", $string_sect);
+	//var_dump(Hex_to_Text($string_sect));
+	//var_dump($string_block_array);
+	//die();
+	for($i=0; $i<100; $i++){
 		$bytes[$i] = substr($string_sect, $buffer, 2);
 		if($bytes[$i] != '00'){
 			$buffer = $buffer + '2';
@@ -159,6 +164,8 @@ function handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string
 	}
 	$ret[2] = $ret_string;
 	
+	//var_dump($ret);
+	//die();
 	
 	return $ret; //$ret[0] is offset of push opcode, $ret[1] is offset pushed, $ret[2] is corresponding native
 }

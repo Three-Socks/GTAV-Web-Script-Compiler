@@ -1044,8 +1044,8 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 		}
 		$file_ext = ".xsc";
 	}
-	else if($script_ext == "csa"){
-	
+	else
+	{
 		if($hex_length <= 8000){
 			//Extend hex to 8,192 bytes
 			while(strlen($hex)/2 < 8192){
@@ -1069,20 +1069,12 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 		}
 		$file_ext = ".csc";
 	}
-	else{
-		//echo "Invalid XSC Type !?!?";
-		//exit();
-	}
 	
 	//Create RSC7 Header String Separate from file. Display on next page
 	$rscheader['graphicsflag'] = "90000000";
 	$libv_header = implode("", $rscheader);
+		
 	
-	$storage_loc = "xscoutput/" . $xsc_final_filename . $file_ext;
-	file_put_contents($storage_loc, pack('H*', $hex));
-
-	$return_html .= '<a class="btn btn-primary btn-lg active" role="button" href="xscoutput/' . $xsc_final_filename . $file_ext . '">Download Script</a>';
-
 	$label_decs_u = array_unique($label_decs);
 	$label_decs_same = array_diff($label_decs, array_diff($label_decs_u, array_diff_assoc($label_decs, $label_decs_u)));
 
@@ -1096,28 +1088,23 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 		}
 	}
 		
-	
-	HTML_Start_Display();
+	if (!empty($return_html))
+	{
+		HTML_Start_Display();
 
-	HTML_Upload_Section($return_html);
+		HTML_Upload_Section($return_html);
 
 
-	HTML_End_Display();
-
-	//DEBUG CODE
-	/*foreach($HeaderValues as $HeaderValue){
-		echo "HeaderValue: $HeaderValue <br />";
+		HTML_End_Display();
 	}
-	
-	echo "<br><br><br>";
-	
-	
-	foreach($final_section as $value){
-		echo "Final Section Value: $value <br />";
+	else
+	{
+		ob_clean();
+		
+		header('Content-Type: application/octet-stream');
+		header("Content-Disposition: attachment; filename=\"" . $xsc_final_filename . $file_ext ."\"");
+		echo pack('H*', $hex);
 	}
-	
-	echo "<br><br><br>";*/
-	
 }
 
 

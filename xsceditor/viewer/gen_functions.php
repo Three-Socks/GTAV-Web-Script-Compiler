@@ -14,7 +14,7 @@ function Hex_to_Dec($hexvalue){
 }
 
 function Hex_to_Text($hexvalue){
-	return pack("H*" , $hexvalue);
+	return hex2bin($hexvalue);
 }
 
 
