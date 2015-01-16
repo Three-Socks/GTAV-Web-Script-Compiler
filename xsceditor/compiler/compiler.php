@@ -13,25 +13,26 @@ include 'gen_comp_functions.php';
 
 if($_POST['xsccode'] == null || $_POST['xsctype'] == null){
 	//If no data was submitted, or some was missing, return to editor
-	header("Location: ../editor/editor.php");
+	header("Location: /xsceditor/");
 
 }
-else if($_POST['xsccode'] != ""){
+else if(!empty($_POST['xsccode']))
+{
 	//XSC Code was submitted. Compile, store as $_POST['filename']
 	if($_POST['xscfinalfilename'] == ""){
 		$error = "Please go back and enter a filename";
 		draw_error_html($error);
 	}
 	$xsc_final_filename = $_POST['xscfinalfilename'];
-	
+
 	$raw_code = $_POST['xsccode'];
 	//$formatted_code = nl2br($raw_code);
-	
+
 	//split by lines
 	str_replace("\r\n", "\n", $raw_code);
 	$lines = explode("\n", $raw_code);
 	$code_lines = array();
-	
+
 	//throw each line into array newlines
 	//remove blank lines and comment lines
 	foreach($lines as $line){
@@ -40,11 +41,13 @@ else if($_POST['xsccode'] != ""){
 		}
 		$code_lines[] = $line;//$code_lines is lines of code
 	}
-	
-	
-	parse_code($code_lines, $xsc_final_filename);
-	
+
+
+	parse_code($code_lines, $xsc_final_filename, $script_ext);
+
 }
+else
+	header("Location: /xsceditor/");
 
 
 ?>

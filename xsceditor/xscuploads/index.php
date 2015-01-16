@@ -10,6 +10,7 @@
 /* Start of actual script */
 
 
+$_POST['file_to_delete'] = isset($_POST['file_to_delete']) ? $_POST['file_to_delete'] : '';
 
 if($_POST['file_to_delete'] != ''){
 	$to_delete = $_SERVER['DOCUMENT_ROOT'] . "/xsceditor/xscuploads" . $_POST['file_to_delete'];

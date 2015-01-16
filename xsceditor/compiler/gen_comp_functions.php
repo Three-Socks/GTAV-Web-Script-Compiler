@@ -35,7 +35,7 @@ function Dec_to_Hex($decimal){//signed decimal to hex
 	}
 	
 	return $ret;*/
-	return dechex($decimal);
+	return dechex((float) $decimal);
 
 }
 
@@ -51,6 +51,12 @@ function String_to_Hex($string){//Convert String to Hex
 	
 	return $hex;
 
+}
+
+function Hex_to_Text($hexvalue){
+	$return = null;
+	for($i=0;$i<strlen($hexvalue);$i+=2) $return .= chr(hexdec(substr($hexvalue,$i,2)));
+	return $return;
 }
 
 
@@ -153,7 +159,7 @@ function Parse_Switch($switch){
 			$hex[] = $temp;
 		}
 		else{//Case
-			$hex[] = str_pad(dechex($temp), 8, '0', STR_PAD_LEFT);
+			$hex[] = str_pad(dechex((float) $temp), 8, '0', STR_PAD_LEFT);
 		}
 	}
 	

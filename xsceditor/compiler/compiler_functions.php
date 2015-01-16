@@ -3,159 +3,11 @@
 /*       This file is the main XSC Compiling Script        */
 
 
-
-
-
-
-function draw_error_html($error){
-	//Draw error html and kill script execution
-	
-	echo <<<EOT
-	<html>
-	
-	<head>
-	<title>XSC Compiler</title>
-	<link rel="icon" type="img/ico" href="../favicon.ico">
-	<link rel="stylesheet" type="text/css" href="../general/style.css">
-	</head>
-	
-	<body>
-	<center>
-	
-	
-	<table background='../general/table_bg.jpg' width = '40%' height = '75px'>
-	<tr width = '40%' height = '75px'>
-	<td align='center' class='control_panel_cell'>
-	<form method='link' action="index.php"><input class='button_cp_main' type="submit" value="Upload File"></form>
-	</td>
-	<td align='center' class='control_panel_cell'>
-	<form method='link' action="xscuploads/"><input class='button_cp_uploadsmanager' type="submit" value="Uploads Manager"></form>
-	</td>
-	<td align='center' class='control_panel_cell'>
-	<form method='link' action="secure/logview.php"><input class='button_cp_logviewer' type="submit" value="Log Viewer"></form>
-	</td>
-	</tr>
-	</table>
-	
-	<br><br><br><br><br><br><br><br><br><br><br><br><br>
-	
-	<table background='../general/table_bg.jpg' width = '50%' height = '75px'>
-	
-	<tr width = '50%' height = '75px'>
-	<td>
-	<center>
-	
-	<br><br><br><br>
-	<p><h2><b><font color='ff0000'>Error: $error</font></b></h2></p>
-	
-	<br>
-	
-	<p>
-	<input action="action" type="button" value="Back" class="button_compile_error" onclick="history.go(-1);" />
-	</p>
-	
-	<br><br><br><br>
-	
-	</center>
-	</td>
-	</tr>
-	
-	</table>
-	
-	
-	</center>
-	</body>
-	
-	</html>	
-	
-EOT;
-
-exit();
-
-}
-
-
-function draw_success_html($xsc_final_filename, $libv_header){
-	//Draw success html and provide file download link
-	
-	$file_link = "../xscoutput/" . $xsc_final_filename . ".xsc";
-	
-	echo <<<EOT
-	<html>
-	
-	<head>
-	<title>XSC Compiler</title>
-	<link rel="icon" type="img/ico" href="../favicon.ico">
-	<link rel="stylesheet" type="text/css" href="../general/style.css">
-	</head>
-	
-	<body>
-	<center>
-	
-	
-	<table background='../general/table_bg.jpg' width = '40%' height = '75px'>
-	<tr width = '40%' height = '75px'>
-	<td align='center' class='control_panel_cell'>
-	<form method='link' action="index.php"><input class='button_cp_main' type="submit" value="Upload File"></form>
-	</td>
-	<td align='center' class='control_panel_cell'>
-	<form method='link' action="xscuploads/"><input class='button_cp_uploadsmanager' type="submit" value="Uploads Manager"></form>
-	</td>
-	<td align='center' class='control_panel_cell'>
-	<form method='link' action="secure/logview.php"><input class='button_cp_logviewer' type="submit" value="Log Viewer"></form>
-	</td>
-	</tr>
-	</table>
-	
-	<br><br><br><br><br><br><br><br><br><br><br><br><br>
-	
-	<table background='../general/table_bg.jpg' width = '50%' height = '75px'>
-	
-	<tr width = '50%' height = '75px'>
-	<td>
-	<center>
-	
-	<br><br><br><br>
-	<p><h2><b><font color='00ff00'>Your XSC has been compiled successfully!</font></b></h2></p>
-	
-	<br><br>
-	
-	<p>
-	<form method="get" action="$file_link">
-	<button type="submit" class="button_compile_success">Download!</button>
-	</form>
-	</p>
-	
-	<br><br><br>
-	
-	<p>
-	<font color="add8e6"><b><h3>Your RSC7 Header is: $libv_header</h3></b></font>
-	</p>
-	<br><br><br><br>
-	
-	</center>
-	</td>
-	</tr>
-	
-	</table>
-	
-	
-	</center>
-	</body>
-	
-	</html>	
-	
-EOT;
-
-
-
-}
-
-
-
-function parse_code($code_lines, $xsc_final_filename){
+function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext){
 	
 	$bytes = array(); //store final product in here to return
+	
+	$return_html = "";
 	
 	$string_sect = array();
 	$string_storage = array();
@@ -177,11 +29,13 @@ function parse_code($code_lines, $xsc_final_filename){
 	
 	//Read until you go thru all the submitted code
 	$i = 0;
-	while($i < count($code_lines)){
+	$code_lines_count = count($code_lines);
+	while($i < $code_lines_count){
 		
 		$line = $code_lines[$i];
 		
-		if(substr_count($line, ":") > 0){//Label Declaration - leave alone for now
+		//if(substr_count($line, ":") > 0){//Label Declaration - leave alone for now
+		if (preg_match("/^\:(.+?)$/", $line)) {
 			//Store label as @Label in array
 			$label_decs[$d] = str_replace(":", "@", preg_replace('/\s+/', '',$line));
 			//Store offset as bytes array max key + 1 because it points to next op
@@ -225,131 +79,131 @@ function parse_code($code_lines, $xsc_final_filename){
 		
 		$temp = array();
 	
-		switch($opcode){
+		switch(strtolower($opcode)){
 			case "nop"://1
 				$bytes[] = "00";
 				break;
-			case "Add"://1
+			case "add"://1
 				$bytes[] = "01";
 				break;
-			case "Sub"://1
+			case "sub"://1
 				$bytes[] = "02";
 				break;
-			case "Mult"://1
+			case "mult"://1
 				$bytes[] = "03";
 				break;
-			case "Div"://1
+			case "div"://1
 				$bytes[] = "04";
 				break;
-			case "Mod"://1
+			case "mod"://1
 				$bytes[] = "05";
 				break;
-			case "Not"://1
+			case "not"://1
 				$bytes[] = "06";
 				break;
-			case "Neg"://1
+			case "neg"://1
 				$bytes[] = "07";
 				break;
-			case "CmpEQ"://1
+			case "cmpeq"://1
 				$bytes[] = "08";
 				break;
-			case "CmpNE"://1
+			case "cmpne"://1
 				$bytes[] = "09";
 				break;
-			case "CmpGT"://1
+			case "cmpgt"://1
 				$bytes[] = "0a";
 				break;
-			case "CmpGE"://1
+			case "cmpge"://1
 				$bytes[] = "0b";
 				break;
-			case "CmpLT"://1
+			case "cmplt"://1
 				$bytes[] = "0c";
 				break;
-			case "CmpLE":
+			case "cmple":
 				$bytes[] = "0d";
 				break;
-			case "fAdd"://1
+			case "fadd"://1
 				$bytes[] = "0e";
 				break;
-			case "fSub"://1
+			case "fsub"://1
 				$bytes[] = "0f";
 				break;
-			case "fMul"://1
+			case "fmul"://1
 				$bytes[] = "10";
 				break;
-			case "fDiv"://1
+			case "fdiv"://1
 				$bytes[] = "11";
 				break;
-			case "fMod"://1
+			case "fmod"://1
 				$bytes[] = "12";
 				break;
-			case "fNeg"://1
+			case "fneg"://1
 				$bytes[] = "13";
 				break;
-			case "FCmpEQ"://1
+			case "fcmpeq"://1
 				$bytes[] = "14";
 				break;
-			case "FCmpNE"://1
+			case "fcmpne"://1
 				$bytes[] = "15";
 				break;
-			case "FCmpGT"://1
+			case "fcmpgt"://1
 				$bytes[] = "16";
 				break;
-			case "FCmpGE"://1
+			case "fcmpge"://1
 				$bytes[] = "17";
 				break;
-			case "FCmpLT"://1
+			case "fcmplt"://1
 				$bytes[] = "18";
 				break;
-			case "FCmpLE"://1
+			case "fcmple"://1
 				$bytes[] = "19";
 				break;
-			case "vAdd"://1
+			case "vadd"://1
 				$bytes[] = "1a";
 				break;
-			case "vSub"://1
+			case "vsub"://1
 				$bytes[] = "1b";
 				break;
-			case "vMul"://1
+			case "vmul"://1
 				$bytes[] = "1c";
 				break;
-			case "vDiv"://1
+			case "vdiv"://1
 				$bytes[] = "1d";
 				break;
-			case "vNeg"://1
+			case "vneg"://1
 				$bytes[] = "1e";
 				break;
-			case "And"://1
+			case "and"://1
 				$bytes[] = "1f";
 				break;
-			case "Or"://1
+			case "or"://1
 				$bytes[] = "20";
 				break;
-			case "Xor"://1
+			case "xor"://1
 				$bytes[] = "21";
 				break;
-			case "ItoF"://1
+			case "itof"://1
 				$bytes[] = "22";
 				break;
-			case "FtoI"://1
+			case "ftoi"://1
 				$bytes[] = "23";
 				break;
-			case "Dup2"://1
+			case "dup2"://1
 				$bytes[] = "24";
 				break;
-			case "Push1"://2
+			case "push1"://2
 				$bytes[] = "25";
 				$temp[0] = dechex($line_parts[1]);
 				$bytes[] = str_pad($temp[0], 2, '0', STR_PAD_LEFT);
 				break;
-			case "Push2"://3
+			case "push2"://3
 				$bytes[] = "26";
 				$temp[0] = dechex($line_parts[1]);
 				$temp[1] = dechex($line_parts[2]);
 				$bytes[] = str_pad($temp[0], 2, '0', STR_PAD_LEFT);
 				$bytes[] = str_pad($temp[1], 2, '0', STR_PAD_LEFT);
 				break;
-			case "Push3"://4
+			case "push3"://4
 				$bytes[] = "27";
 				$temp[0] = dechex($line_parts[1]);
 				$temp[1] = dechex($line_parts[2]);
@@ -358,7 +212,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = str_pad($temp[1], 2, '0', STR_PAD_LEFT);
 				$bytes[] = str_pad($temp[2], 2, '0', STR_PAD_LEFT);
 				break;
-			case "Push"://5
+			case "push"://5
 				$bytes[] = "28";
 				$temp[0] = Dec_to_Hex($line_parts[1]);
 				//split into array to place 2 at a time
@@ -370,7 +224,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[3];
 				unset($arr);
 				break;
-			case "fPush"://5
+			case "fpush"://5
 				$bytes[] = "29";
 				//Convert to 32 bit hex. Every 2 chars into array key
 				$temp[0] = Float2Hex($line_parts[1]);
@@ -382,13 +236,13 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[3];
 				unset($arr);
 				break;
-			case "Dup"://1
+			case "dup"://1
 				$bytes[] = "2a";
 				break;
-			case "Drop"://1
+			case "drop"://1
 				$bytes[] = "2b";
 				break;
-			case "CallNative"://4 (special)
+			case "callnative"://4 (special)
 				$bytes[] = "2c";
 				//Get Native Hex Hash
 				if(substr_count($line_parts[1], "UNK_") > 0){//if it's a UNK_
@@ -419,7 +273,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$nat_loc = null;
 				unset($arr);
 				break;
-			case "Function"://5
+			case "function"://5
 				$bytes[] = "2d";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$temp[1] = str_pad(dechex($line_parts[2]), 4, '0', STR_PAD_LEFT);
@@ -429,102 +283,102 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = substr($temp[1], 2, 2);
 				$bytes[] = $temp[2];
 				break;
-			case "Return"://3
+			case "return"://3
 				$bytes[] = "2e";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$temp[1] = str_pad(dechex($line_parts[2]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				$bytes[] = $temp[1];
 				break;
-			case "pGet"://1
+			case "pget"://1
 				$bytes[] = "2f";
 				break;
-			case "pSet"://1
+			case "pset"://1
 				$bytes[] = "30";
 				break;
-			case "pPeekSet"://1
+			case "ppeekset"://1
 				$bytes[] = "31";
 				break;
-			case "ToStack"://1
+			case "tostack"://1
 				$bytes[] = "32";
 				break;
-			case "FromStack"://1
+			case "fromstack"://1
 				$bytes[] = "33";
 				break;
-			case "ArrayGetP1"://2
+			case "arraygetp1"://2
 				$bytes[] = "34";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "ArrayGet1"://2
+			case "arrayget1"://2
 				$bytes[] = "35";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "ArraySet1"://2
+			case "arrayset1"://2
 				$bytes[] = "36";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "pFrame1"://2
+			case "pframe1"://2
 				$bytes[] = "37";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "getF1"://2
+			case "getf1"://2
 				$bytes[] = "38";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "setF1"://2
+			case "setf1"://2
 				$bytes[] = "39";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "pStatic1"://2
+			case "pstatic1"://2
 				$bytes[] = "3a";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "StaticGet1"://2
+			case "staticget1"://2
 				$bytes[] = "3b";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "StaticSet1"://2
+			case "staticset1"://2
 				$bytes[] = "3c";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "Add1"://2
+			case "add1"://2
 				$bytes[] = "3d";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "Mult1"://2
+			case "mult1"://2
 				$bytes[] = "3e";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "GetStackImmediateP"://1
+			case "getstackimmediatep"://1
 				$bytes[] = "3f";
 				break;
-			case "GetImmediateP1"://2
+			case "getimmediatep1"://2
 				$bytes[] = "40";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "GetImmediate1"://2
+			case "getimmediate1"://2
 				$bytes[] = "41";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "SetImmediate1"://2
+			case "setimmediate1"://2
 				$bytes[] = "42";
 				$temp[0] = str_pad(dechex($line_parts[1]), 2, '0', STR_PAD_LEFT);
 				$bytes[] = $temp[0];
 				break;
-			case "PushS"://3
+			case "pushs"://3
 				$bytes[] = "43";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -533,7 +387,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "Add2"://3
+			case "add2"://3
 				$bytes[] = "44";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -542,7 +396,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "Mult2"://3
+			case "mult2"://3
 				$bytes[] = "45";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -551,7 +405,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "GetStackImmediateP2"://3
+			case "getstackimmediatep2"://3
 				$bytes[] = "46";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -560,7 +414,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "GetImmediate2"://3
+			case "getimmediate2"://3
 				$bytes[] = "47";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -569,7 +423,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "SetImmediate2"://3
+			case "setimmediate2"://3
 				$bytes[] = "48";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -578,7 +432,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "ArrayGetP2"://3
+			case "arraygetp2"://3
 				$bytes[] = "49";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -587,7 +441,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "ArrayGet2"://3
+			case "arrayget2"://3
 				$bytes[] = "4a";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -596,7 +450,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "ArraySet2"://3
+			case "arrayset2"://3
 				$bytes[] = "4b";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -605,7 +459,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "pFrame2"://3
+			case "pframe2"://3
 				$bytes[] = "4c";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -614,7 +468,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "getF2"://3
+			case "getf2"://3
 				$bytes[] = "4d";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -623,7 +477,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "SetF2"://3
+			case "setf2"://3
 				$bytes[] = "4e";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -632,7 +486,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "pStatic2"://3
+			case "pstatic2"://3
 				$bytes[] = "4f";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -641,7 +495,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "StaticGet2"://3
+			case "staticget2"://3
 				$bytes[] = "50";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -650,7 +504,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "StaticSet2"://3
+			case "staticset2"://3
 				$bytes[] = "51";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -659,7 +513,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "pGlobal2"://3
+			case "pglobal2"://3
 				$bytes[] = "52";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -668,7 +522,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "globalGet2"://3
+			case "globalget2"://3
 				$bytes[] = "53";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -677,7 +531,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "globalSet2"://3
+			case "globalset2"://3
 				$bytes[] = "54";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -686,53 +540,53 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "Jump"://2 special
+			case "jump"://2 special
 				$bytes[] = "55";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpFalse"://2 special
+			case "jumpfalse"://2 special
 				$bytes[] = "56";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpNE"://2 special
+			case "jumpne"://2 special
 				$bytes[] = "57";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpEQ"://2 special
+			case "jumpeq"://2 special
 				$bytes[] = "58";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpLE"://2 special
+			case "jumple"://2 special
 				$bytes[] = "59";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpLT"://2 special
+			case "jumplt"://2 special
 				$bytes[] = "5a";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpGE"://2 special
+			case "jumpge"://2 special
 				$bytes[] = "5b";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "JumpGT"://2 special
+			case "jumpgt"://2 special
 				$bytes[] = "5c";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				break;
-			case "Call"://3 special
+			case "call"://3 special
 				$bytes[] = "5d";
 				$bytes[] = $line_parts[1];
 				$bytes[] = "";
 				$bytes[] = "";
 				break;
-			case "pGlobal3"://4
+			case "pglobal3"://4
 				$bytes[] = "5e";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -742,7 +596,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[2];
 				unset($arr);
 				break;
-			case "globalGet3"://4
+			case "globalget3"://4
 				$bytes[] = "5f";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -752,7 +606,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[2];
 				unset($arr);
 				break;
-			case "globalSet3"://4
+			case "globalset3"://4
 				$bytes[] = "60";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -762,7 +616,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[2];
 				unset($arr);
 				break;
-			case "pushI24"://4
+			case "pushi24"://4
 				$bytes[] = "61";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -772,7 +626,7 @@ function parse_code($code_lines, $xsc_final_filename){
 				$bytes[] = $arr[2];
 				unset($arr);
 				break;
-			case "Switch"://* (special)
+			case "switch"://* (special)
 				$bytes[] = "62";
 				$begin_bracket_count = dechex(substr_count($line_parts[1], "]"));
 				$end_bracket_count = dechex(substr_count($line_parts[1], "]"));
@@ -785,16 +639,16 @@ function parse_code($code_lines, $xsc_final_filename){
 					$bytes[] = $thing;
 				}
 				break;
-			case "PushString"://1 (special)
+			case "pushstring"://1 (special)
 				//Get string hex
 				$hex = String_to_Hex($line_parts[1]);
-				echo "String: $line_parts[1], ";
+				//echo "String: $line_parts[1], ";
 				//Get string start offset
 				if(array_search($hex, $string_storage) !== false){
 					//If string is already in string section...
 					$temp = array_search($hex, $string_storage);
 					$offset = $string_offset_storage[$temp];
-					echo "Offset: $offset<br />";
+					//echo "Offset: $offset<br />";
 					unset($temp);
 				}else{//Get string offset. Store offset and string in storage arrays
 					//String is unique. Get offset and add to string sect
@@ -802,7 +656,7 @@ function parse_code($code_lines, $xsc_final_filename){
 					$string_offset_storage[$s] = $offset;
 					$string_storage[$s] = $hex;
 					$s++;
-					echo "Offset: $offset<br />";
+					//echo "Offset: $offset<br />";
 					
 					//Store in string sect byte by byte
 					if($hex == ""){
@@ -833,39 +687,39 @@ function parse_code($code_lines, $xsc_final_filename){
 				$offset = null;
 				unset($to_push);
 				break;
-			case "GetHash"://1
+			case "gethash"://1
 				$bytes[] = "64";
 				break;
-			case "StrCopy"://2
+			case "strcopy"://2
 				$bytes[] = "65";
 				$temp[0] = dechex($line_parts[1]);
 				$bytes[] = str_pad($temp[0], 2, '0', STR_PAD_LEFT);
 				break;
-			case "ItoS"://2
+			case "itos"://2
 				$bytes[] = "66";
 				$temp[0] = dechex($line_parts[1]);
 				$bytes[] = str_pad($temp[0], 2, '0', STR_PAD_LEFT);
 				break;
-			case "StrAdd"://2
+			case "stradd"://2
 				$bytes[] = "67";
 				$temp[0] = dechex($line_parts[1]);
 				$bytes[] = str_pad($temp[0], 2, '0', STR_PAD_LEFT);
 				break;
-			case "StrAddi"://2
+			case "straddi"://2
 				$bytes[] = "68";
 				$temp[0] = dechex($line_parts[1]);
 				$bytes[] = str_pad($temp[0], 2, '0', STR_PAD_LEFT);
 				break;
-			case "SnCopy"://1
+			case "sncopy"://1
 				$bytes[] = "69";
 				break;
-			case "Catch"://1
+			case "catch"://1
 				$bytes[] = "6a";
 				break;
-			case "Throw"://1
+			case "throw"://1
 				$bytes[] = "6b";
 				break;
-			case "pCall"://1
+			case "pcall"://1
 				$bytes[] = "6c";
 				break;
 			case "push_-1"://1
@@ -895,38 +749,38 @@ function parse_code($code_lines, $xsc_final_filename){
 			case "push_7"://1
 				$bytes[] = "75";
 				break;
-			case "fPush_-1"://1
+			case "fpush_-1"://1
 				$bytes[] = "76";
 				break;
-			case "fPush_0.0"://1
+			case "fpush_0.0"://1
 				$bytes[] = "77";
 				break;
-			case "fPush_1.0"://1
+			case "fpush_1.0"://1
 				$bytes[] = "78";
 				break;
-			case "fPush_2.0"://1
+			case "fpush_2.0"://1
 				$bytes[] = "79";
 				break;
-			case "fPush_3.0"://1
+			case "fpush_3.0"://1
 				$bytes[] = "7a";
 				break;
-			case "fPush_4.0"://1
+			case "fpush_4.0"://1
 				$bytes[] = "7b";
 				break;
-			case "fPush_5.0"://1
+			case "fpush_5.0"://1
 				$bytes[] = "7c";
 				break;
-			case "fPush_6.0"://1
+			case "fpush_6.0"://1
 				$bytes[] = "7d";
 				break;
-			case "fPush_7.0"://1
+			case "fpush_7.0"://1
 				$bytes[] = "7e";
 				break;
 			case "unk_op"://1
 				$bytes[] = str_pad(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $line_parts[1]), 2, '0', STR_PAD_LEFT);
 				break;
 			default:
-				$error = "Error! Op is $opcode??";
+				$return_html .= "<p class=\"bg-danger\">Compile error! Unk opcode: $opcode</p>";
 		}
 		//Still do CallNative, PushString, and Switch
 		
@@ -946,7 +800,8 @@ function parse_code($code_lines, $xsc_final_filename){
 	//$label_decs_offsets
 	//str_pad( , 6, '0', STR_PAD_LEFT);
 	$m = 0;
-	while($m < count($bytes)){
+	$bytes_count = count($bytes);
+	while($m < $bytes_count){
 		if(substr_count($bytes[$m], "@") > 0){
 			//Array key contains @Label
 			$key = array_search(preg_replace('/\s+/', '',$bytes[$m]), $label_decs);
@@ -955,14 +810,14 @@ function parse_code($code_lines, $xsc_final_filename){
 			if($key === false){//If it jumps to a non-existent label...
 				if($bytes[$one_up] == "" && $bytes[$two_up] == ""){
 					//Call to non-existing label. just put FF. extend to 6 bytes
-					echo "<b>Hit a Call FF. Label: $bytes[$m]</b><br />";
+					$return_html .= "<p class=\"bg-danger\">Compile error! >Hit a Call FF. Label: " . $bytes[$m] . "</p>";
 					$bytes[$m] = "FF";
 					$bytes[$one_up] = "FF";
 					$bytes[$two_up] = "FF";
 				}
 				else if($bytes[$one_up] == "" && $bytes[$two_up] != ""){
 					//Jump to non-existing label. just put FF. extend to 6 bytes
-					echo "<b>Hit a Jump FF. Label: $bytes[$m]</b><br />";
+					$return_html .= "<p class=\"bg-danger\">Compile error! >Hit a Jump FF. Label: " . $bytes[$m] . "</p>";
 					$bytes[$m] = "FF";
 					$bytes[$one_up] = "FF";
 				}
@@ -1023,9 +878,9 @@ function parse_code($code_lines, $xsc_final_filename){
 	
 	
 	//debug
-	foreach($native_sect as $native){
-		echo "Native: $native <br />";
-	}
+	//foreach($native_sect as $native){
+	//	echo "Native: $native <br />";
+	//}
 	
 	//Create Native Sect
 	$native_sect = implode("", $native_sect);
@@ -1034,21 +889,28 @@ function parse_code($code_lines, $xsc_final_filename){
 	while((strlen($native_sect) / 2) % 16 != 0){
 		$native_sect = $native_sect . "00";
 	}
-	
-	
+
+	//Create Static Sect
+	//$static_sect = array('00000006', '0000000A', '00000032', '00000032', '00000032', '00000032', '00000017');
+	$static_sect = implode("", $static_sect);
+	$static_sect_length = strlen($static_sect) / 2;
+	$static_count = strlen($static_sect) / 8;
+	while((strlen($static_sect) / 2) % 16 != 0){
+		$static_sect = $static_sect . "00";
+	}
 	
 	//Create Header. Header is 80 bytes.
 	$HeaderValues = array();
 	$HeaderValues['magic'] = "34274500";
 	$HeaderValues['unk1'] = "";//Pointer to 01 at end of file
 	$HeaderValues['codepagesoffset'] = "";//Pointer to code pages at end of file
-	$HeaderValues['globalsversion'] = "fdf69e36";
+	$HeaderValues['globalsversion'] = "11cd39a2";
 	$HeaderValues['codelength'] = str_pad(dechex($code_sect_length), 8, '0', STR_PAD_LEFT);
 	$HeaderValues['parametercount'] = "00000000";
-	$HeaderValues['staticscount'] = "00000000";
+	$HeaderValues['staticscount'] = str_pad(dechex($static_count), 8, '0', STR_PAD_LEFT);
 	$HeaderValues['globalscount'] = "00000000";
 	$HeaderValues['nativecount'] = str_pad(dechex($native_count), 8, '0', STR_PAD_LEFT);
-	$HeaderValues['staticsoffset'] = "00000000";
+	$HeaderValues['staticsoffset'] = "";
 	$HeaderValues['globalsoffset'] = "00000000";
 	$HeaderValues['nativesoffset'] = "";//Pointer to native sect start
 	$HeaderValues['unk2'] = "00000000";
@@ -1060,8 +922,6 @@ function parse_code($code_lines, $xsc_final_filename){
 	$HeaderValues['stringssize'] = str_pad(dechex($string_sect_length), 8, '0', STR_PAD_LEFT);
 	$HeaderValues['unk6'] = "00000000";
 	
-	
-	
 	//Create last section (code/string block pointers, and filename)
 	$final_section = array();
 	
@@ -1072,10 +932,14 @@ function parse_code($code_lines, $xsc_final_filename){
 	$filelength_so_far = $code_sect_so_far + $string_sect_so_far + $native_sect_so_far + 80;
 	//also create native location offset
 	$native_sect_offset = $code_sect_so_far + $string_sect_so_far + 80;
-	
-	
+
 	//add some padding
 	$final_section['padding'] = "00000000000000000000000000000000";
+
+	$final_section['statics'] = $static_sect;
+	$static_sect_so_far = strlen($static_sect) / 2;
+	$static_sect_offset = $filelength_so_far + 16;
+	$filelength_so_far = $filelength_so_far + $static_sect_so_far;
 	
 	//location of filename
 	$filename_pointer_loc = $filelength_so_far + 16;
@@ -1104,8 +968,6 @@ function parse_code($code_lines, $xsc_final_filename){
 	}
 	$final_section['codeblocks'] = $codeblocks;
 	
-	
-	
 	//location of string block pointer
 	$stringblocks_pointer_loc = $filelength_so_far + 48;
 	//string block pointer
@@ -1123,24 +985,20 @@ function parse_code($code_lines, $xsc_final_filename){
 	}
 	$final_section['stringblocks'] = $stringblocks;
 	
-	
 	//location of extra 01 at end
 	$oneatend_pointer_loc = $filelength_so_far + 64;
 	//create extra 01 at end
 	$final_section['oneatend'] = "00000000010000000000000000000000";
-	
-	
+
 	$final_sect = implode("", $final_section);
-	
-	
 	
 	//Fill in remaining Header Values
 	$HeaderValues['unk1'] = create_pointer_from_offset(dechex($oneatend_pointer_loc));
 	$HeaderValues['codepagesoffset'] = create_pointer_from_offset(dechex($codeblocks_pointer_loc));
 	$HeaderValues['nativesoffset'] = create_pointer_from_offset(dechex($native_sect_offset));
+	$HeaderValues['staticsoffset'] = create_pointer_from_offset(dechex($static_sect_offset));
 	$HeaderValues['scriptnameoffset'] = create_pointer_from_offset(dechex($filename_pointer_loc));
 	$HeaderValues['stringpagesoffset'] = create_pointer_from_offset(dechex($stringblocks_pointer_loc));
-	
 	
 	//Start throwing together parts
 	$xsc_parts = array();
@@ -1150,11 +1008,7 @@ function parse_code($code_lines, $xsc_final_filename){
 	$xsc_parts['natives'] = $native_sect;
 	$xsc_parts['final'] = $final_sect;
 	
-	
-	
 	$hex = implode("", $xsc_parts);
-	
-	
 	
 	//NOW DEAL WITH RSC7 HEADER SHIT
 	$rscheader = array();
@@ -1164,7 +1018,7 @@ function parse_code($code_lines, $xsc_final_filename){
 	//Make sure output is a multiple of 4,096 or 8,192 or 12,288, or 16,384
 	$hex_length = strlen($hex) / 2;
 	
-	if($_POST['xsctype'] == "xsc"){
+	if($script_ext == "xsa"){
 		//XSC RSC7 Headers
 		
 		if($hex_length <= 8000){
@@ -1190,7 +1044,7 @@ function parse_code($code_lines, $xsc_final_filename){
 		}
 		$file_ext = ".xsc";
 	}
-	else if($_POST['xsctype'] == "csc"){
+	else if($script_ext == "csa"){
 	
 		if($hex_length <= 8000){
 			//Extend hex to 8,192 bytes
@@ -1216,22 +1070,40 @@ function parse_code($code_lines, $xsc_final_filename){
 		$file_ext = ".csc";
 	}
 	else{
-		echo "Invalid XSC Type !?!?";
-		exit();
+		//echo "Invalid XSC Type !?!?";
+		//exit();
 	}
-	
 	
 	//Create RSC7 Header String Separate from file. Display on next page
 	$rscheader['graphicsflag'] = "90000000";
 	$libv_header = implode("", $rscheader);
 	
-	$storage_loc = "..//xscoutput/" . $xsc_final_filename . $file_ext;
+	$storage_loc = "xscoutput/" . $xsc_final_filename . $file_ext;
 	file_put_contents($storage_loc, pack('H*', $hex));
+
+	$return_html .= '<a class="btn btn-primary btn-lg active" role="button" href="xscoutput/' . $xsc_final_filename . $file_ext . '">Download Script</a>';
+
+	$label_decs_u = array_unique($label_decs);
+	$label_decs_same = array_diff($label_decs, array_diff($label_decs_u, array_diff_assoc($label_decs, $label_decs_u)));
+
+	if (!empty($label_decs_same))
+	{
+		$return_html .= '<br /><p class="text-danger">Duplicate labels found</p>';
+		
+		foreach ($label_decs_same as $label)
+		{
+			$return_html .= '<p class="text-danger">' . $label . '</p>';
+		}
+	}
+		
 	
-	
-	draw_success_html($xsc_final_filename, $libv_header);
-	
-	
+	HTML_Start_Display();
+
+	HTML_Upload_Section($return_html);
+
+
+	HTML_End_Display();
+
 	//DEBUG CODE
 	/*foreach($HeaderValues as $HeaderValue){
 		echo "HeaderValue: $HeaderValue <br />";

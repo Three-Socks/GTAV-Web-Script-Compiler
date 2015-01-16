@@ -16,7 +16,7 @@ function handle_callnative($extra_byte, $native_loc, $callnative_array){
 	
 	$return = array();
 	
-	$return[0] =  '"' . strtoupper($callnative_array[$native_loc]) . '"';  //GLOBALS['callnative_array'] is the array containing all the natives in the script in text
+	$return[0] = isset ($callnative_array[$native_loc]) ? '"' . strtoupper($callnative_array[$native_loc]) . '"' : '';  //GLOBALS['callnative_array'] is the array containing all the natives in the script in text
 	$return[1] = $extra_byte >> 2; //Params Taken
 	$return[2] = $extra_byte & 3; //Params Returned
 
@@ -146,10 +146,10 @@ function handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string
 	$buffer = hexdec($stack) *2;
 	$ret[1] = $buffer;
 	
-	for($i=0; $i<100; $i++){
+	for($i=0; $i<50; $i++){
 		$bytes[$i] = substr($string_sect, $buffer, 2);
 		if($bytes[$i] != '00'){
-			$buffer = $buffer + 2;
+			$buffer = $buffer + '2';
 			continue;
 		}
 		unset($bytes[$i]);
@@ -175,7 +175,7 @@ function parse_opcodes($script_sections){
 	$string_sect = $script_sections['string_sect'];
 	$native_sect = $script_sections['native_sect'];
 	$callnative_array = array();
-	$callnative_array = Get_Text_Natives("../general/RawNatives.txt", $script_sections);
+	$callnative_array = Get_Text_Natives("general/RawNatives.txt", "general/RawHashes.txt", $script_sections);
 	
 	$script_bytes = new SplFixedArray(strlen($code_sect)/2);
 	$script_bytes = str_split($code_sect, 2);
@@ -183,20 +183,10 @@ function parse_opcodes($script_sections){
 	
 	
 	//Setup Progress Bar related shit
-	echo <<<EOT
-	<div id="progress_container" style="width:200px; height:30px; float:center;">
-		Decompiling...<br />
-		<progress id="progress" value="0" max="100">
-		</progress>
-		<div id="progress_percent">
-		</div>
-	</div>
-EOT;
+	HTML_progress_bar();
 	
 	$decompiled_output = '';
 	$passes = 0;
-	
-	
 	
 	//First pass will use same opcode switch, but its to find jumps and calls and place labels
 	
@@ -217,7 +207,6 @@ EOT;
 		//Clear Values
 		unset($temp);
 		$offset = null;
-		$absolute_offset = null;
 		$temp = array();
 		
 		
@@ -231,10 +220,9 @@ EOT;
 			$buffer++;
 			$temp[1] = $script_bytes[$buffer];
 			$buffer++;
-			$offset = Uint16toInt16(hexdec($temp[0] . $temp[1]));
-			$absolute_offset = $buffer + $offset;
-			if(array_search($absolute_offset, $jump_call_offsets) === false){
-				$jump_call_offsets[] = $absolute_offset;
+			$offset = Uint16toInt16(hexdec($temp[0] . $temp[1])) + $buffer;
+			if(array_search($offset, $jump_call_offsets) === false){
+				$jump_call_offsets[] = $offset;
 			}
 			continue;
 		}
@@ -269,10 +257,9 @@ EOT;
 				$buffer++;
 				$temp[1] = $script_bytes[$buffer];
 				$buffer++;
-				$offset = Uint16toInt16(hexdec($temp[0] . $temp[1]));
-				$absolute_offset = $buffer + $offset;
-				if(array_search($absolute_offset, $jump_call_offsets) === false){
-					$jump_call_offsets[] = $absolute_offset;
+				$offset = Uint16toInt16(hexdec($temp[0] . $temp[1])) + $buffer;
+				if(array_search($offset, $jump_call_offsets) === false){
+					$jump_call_offsets[] = $offset;
 				}
 			}
 			continue;
@@ -281,10 +268,10 @@ EOT;
 			$buffer++;
 			$push_s_arr = array();
 			$push_s_arr = handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string_sect);
-			$ops_to_ignore_offsets[] = $push_s_arr[0];
-			$ops_to_ignore_pushed_off[] = $push_s_arr[1];
-			$pushstring_assoc[] = $push_s_arr[2];
-			$offsets_after_push[] = $push_s_arr[3];
+			$ops_to_ignore_offsets[] = isset($push_s_arr[0]) ? $push_s_arr[0] : 0;
+			$ops_to_ignore_pushed_off[] = isset($push_s_arr[1]) ? $push_s_arr[1] : 0;
+			$pushstring_assoc[] = isset($push_s_arr[2]) ? $push_s_arr[2] : 0;
+			$offsets_after_push[] = isset($push_s_arr[3]) ? $push_s_arr[3] : 0;
 			unset($push_s_arr);
 			continue;
 		}
@@ -762,7 +749,7 @@ EOT;
 					$buffer++;
 					break;
 				default:
-					$script_errors[] = "Error - opcode:$opcode, buffer:$buffer&#13;&#10;";
+					$script_errors[] = "Error - opcode:$opcode, buffer:$buffer\n";
 					$buffer++;
 					break;
 			}//End Switch
@@ -793,7 +780,7 @@ EOT;
 	
 	
 	free_memory();
-	sleep(2);
+	//sleep(2);
 	
 	//Second pass where shit is put into high-level format
 	$buffer = 0;
@@ -810,15 +797,18 @@ EOT;
 		
 		$buffers_passed[$b] = $buffer;
 		$b++;
-		
+
 		$l = array_search($buffer, $jump_call_offsets);
 		if($l !== false){
-			$decompiled_output .= ":Label_$l&#13;&#10;";
+			$decompiled_output .= "\n:Label_$l\n";
 		}
 		$l = null;
 		
 		//For PushString, if the current offset is a push before a pushstring, advance buffer past it
-		for($h=0; $h<count($ops_to_ignore_offsets); $h++){
+		$ops_to_ignore_offsets_count = count($ops_to_ignore_offsets);
+		
+		// !! was count($ops_to_ignore_offsets_count)
+		for($h=0; $h<$ops_to_ignore_offsets_count; $h++){
 			if($buffer == $ops_to_ignore_offsets[$h]){//If buffer is a buffer to skip
 				
 				//echo "buffer equaled offset to ignore";
@@ -1049,7 +1039,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$bytes_linked = hexdec($linked[0]) . "&nbsp;" . hexdec($linked[1]);
+				$bytes_linked = hexdec($linked[0]) . " " . hexdec($linked[1]);
 				if($bytes_linked == "0" || $bytes_linked == ""){
 					$bytes_linked = '0';
 				}
@@ -1063,7 +1053,7 @@ EOT;
 				$buffer++;
 				$linked[2] = $script_bytes[$buffer];
 				$buffer++;
-				$bytes_linked = hexdec($linked[0]) . "&nbsp;" . hexdec($linked[1]) . "&nbsp;" . hexdec($linked[2]);
+				$bytes_linked = hexdec($linked[0]) . " " . hexdec($linked[1]) . " " . hexdec($linked[2]);
 				if($bytes_linked == "0" || $bytes_linked == ""){
 					$bytes_linked = '0';
 				}
@@ -1122,7 +1112,7 @@ EOT;
 				$native_loc = hexdec($linked[1] . $linked[2]);
 				$return = array(); //$return[0] = native, $return[1] = taken, $return[2] = returned
 				$return = handle_callnative($extra_byte, $native_loc, $callnative_array);
-				$bytes_linked = $return[0] . "&nbsp;" . $return[1] . "&nbsp;" . $return[2];    //Extra code for CallNative
+				$bytes_linked = $return[0] . " " . $return[1] . " " . $return[2];    //Extra code for CallNative
 				unset($return);
 				$extra_byte = null;
 				$native_loc = null;
@@ -1138,7 +1128,7 @@ EOT;
 				$buffer++;
 				$linked[2] = $script_bytes[$buffer];
 				$buffer++;
-				$bytes_linked = hexdec($linked[0]) . "&nbsp;" . hexdec($linked[1]) . "&nbsp;" . hexdec($linked[2]);
+				$bytes_linked = hexdec($linked[0]) . " " . hexdec($linked[1]) . " " . hexdec($linked[2]) . "\n";
 				$temp = null;
 				break;
 			case "2e":
@@ -1148,7 +1138,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$bytes_linked = hexdec($linked[0]) . "&nbsp;" . hexdec($linked[1])  . "&#13;&#10;" . "&#13;&#10;";
+				$bytes_linked = hexdec($linked[0]) . " " . hexdec($linked[1]);
 				break;
 			case "2f":
 				$opcode_show = "pGet";
@@ -1307,10 +1297,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$bytes_linked = hexdec($linked[0] . $linked[1]);
-				if($bytes_linked == "0" || $bytes_linked == ""){
-					$bytes_linked = '0';
-				}
+				$bytes_linked = Hex_to_Dec($linked[0] . $linked[1]);
 				break;
 			case "44":
 				$opcode_show = "Add2";
@@ -1337,7 +1324,7 @@ EOT;
 				}
 				break;
 			case "46":
-				$opcode_show = "GetStackImmediateP";
+				$opcode_show = "GetStackImmediateP2";
 				$buffer++;
 				$linked[0] = $script_bytes[$buffer];
 				$buffer++;
@@ -1523,7 +1510,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
          		for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1533,6 +1520,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "56":
 				$opcode_show = "JumpFalse";
@@ -1541,7 +1529,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1551,6 +1539,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
           		break;
 			case "57":
 				$opcode_show = "JumpNE";
@@ -1559,7 +1548,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1569,6 +1558,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "58":
 				$opcode_show = "JumpEQ";
@@ -1577,7 +1567,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1587,6 +1577,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "59":
 				$opcode_show = "JumpLE";
@@ -1595,7 +1586,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1605,6 +1596,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "5a":
 				$opcode_show = "JumpLT";
@@ -1613,7 +1605,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1623,6 +1615,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "5b":
 				$opcode_show = "JumpGE";
@@ -1631,7 +1624,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1641,6 +1634,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "5c":
 				$opcode_show = "JumpGT";
@@ -1649,7 +1643,7 @@ EOT;
 				$buffer++;
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
-				$temp = Uint16toInt16(Hex_to_Dec($linked[0] . $linked[1])) + $buffer;
+				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
 				for($i=0; $i<$max_jumpcalls; $i++){
             		if($temp == $jump_call_offsets[$i]){
               			$bytes_linked = "@Label_$i";
@@ -1659,6 +1653,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "5d":
 				$opcode_show = "Call";
@@ -1679,6 +1674,7 @@ EOT;
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
+				$temp = null;
 				break;
 			case "5e":
 				$opcode_show = "pGlobal3";
@@ -1752,9 +1748,9 @@ EOT;
 					$jumps[$j] = $temp[4] . $temp[5];
 					$buffer++;
 					//Now figure out label
-					$temp1 = Uint16toInt16(Hex_to_Dec($jumps[$j])) + $buffer;
+					$temp1 = Uint16toInt16(hexdec($jumps[$j])) + $buffer;
                   	$p = array_search($temp1, $jump_call_offsets);
-					if(!isset($p)){
+					if($p === false){
 						$labels[$l] = "@off_$temp1";
 					}
 					else{
@@ -1794,25 +1790,25 @@ EOT;
 			case "65":
 				$opcode_show = "StrCopy";
 				$buffer++;
-				$bytes_linked = $script_bytes[$buffer];
+				$bytes_linked = hexdec($script_bytes[$buffer]);
 				$buffer++;
 				break;
 			case "66":
 				$opcode_show = "ItoS";
 				$buffer++;
-				$bytes_linked = $script_bytes[$buffer];
+				$bytes_linked = hexdec($script_bytes[$buffer]);
 				$buffer++;
 				break;
 			case "67":
 				$opcode_show = "StrAdd";
 				$buffer++;
-				$bytes_linked = $script_bytes[$buffer];
+				$bytes_linked = hexdec($script_bytes[$buffer]);
 				$buffer++;
 				break;
 			case "68":
 				$opcode_show = "StrAddi";
 				$buffer++;
-				$bytes_linked = $script_bytes[$buffer];
+				$bytes_linked = hexdec($script_bytes[$buffer]);
 				$buffer++;
 				break;
 			case "69":
@@ -1913,9 +1909,9 @@ EOT;
 		//Once switch is complete, echo opcode name, space, bytes linked (if there are any), then newline
 		$decompiled_output .= $opcode_show;
 		if($bytes_linked != null){
-			$decompiled_output .= "&nbsp;" . $bytes_linked;
+			$decompiled_output .= " " . $bytes_linked;
 		}
-		$decompiled_output .= "&#13;&#10;";
+		$decompiled_output .= "\n";
 		
 		
 		//Reset values after loop. This prevents values from concatenating onto each other - stupid php
@@ -1933,16 +1929,17 @@ EOT;
 			if($perc < 100){
 				echo <<<EOT
 				<script type='text/javascript'>
-				document.getElementById('progress').value = '$perc';
-				document.getElementById('progress_percent').innerHTML = '$percent';
+				document.getElementById('progress_bar').style.width = '$perc'+'%';
+				document.getElementById('progress_bar').setAttribute('aria-valuenow', '$perc')
+				document.getElementById('progress_bar').innerHTML = '<span class="sr-only">$percent Complete</span>';
 				</script>
 EOT;
 			}else{
 				echo <<<EOT
 				<script type='text/javascript'>
-				document.getElementById('progress').value = '100';
-				document.getElementById('progress_percent').innerHTML = 'Done!';
-				document.getElementById('progress_container').innerHTML = '';
+				document.getElementById('progress_bar').style.width = '100'+'%';
+				document.getElementById('progress_bar').setAttribute('aria-valuenow', '100')
+				document.getElementById('progress_bar').innerHTML = '<span class="sr-only">Done!</span>';
 				</script>
 EOT;
 			}
@@ -1956,40 +1953,40 @@ EOT;
 	
 	
 	echo <<<EOT
-	<script type='text/javascript'>
-	document.getElementById('progress').value = '100';
-	document.getElementById('progress_percent').innerHTML = 'Done!';
-	document.getElementById('progress_container').innerHTML = '';
-	</script>
+				<script type='text/javascript'>
+				document.getElementById('progress_bar').style.width = '100'+'%';
+				document.getElementById('progress_bar').setAttribute('aria-valuenow', '100')
+				document.getElementById('progress_bar').innerHTML = '<span class="sr-only">Done!</span>';
+				</script>
 EOT;
 	
 	
 	/* DEBUG CODE */
-	/*echo "371: " . array_search("371", $buffers_passed) . "&#13;&#10;";
-	echo "436: " . array_search("436", $buffers_passed) . "&#13;&#10;";
-	echo "804: " . array_search("804", $buffers_passed) . "&#13;&#10;";//did buffer pass offset
-	echo "2078: " . array_search("2078", $buffers_passed) . "&#13;&#10;";
+	/*echo "371: " . array_search("371", $buffers_passed) . "\n";
+	echo "436: " . array_search("436", $buffers_passed) . "\n";
+	echo "804: " . array_search("804", $buffers_passed) . "\n";//did buffer pass offset
+	echo "2078: " . array_search("2078", $buffers_passed) . "\n";
 	
-	echo "&#13;&#10;";
+	echo "\n";
 	
-	echo "371: " . array_search("371", $jump_call_offsets) . "&#13;&#10;";//is offset in jump_calls
-	echo "436: " . array_search("436", $jump_call_offsets) . "&#13;&#10;";
-	echo "804: " . array_search("804", $jump_call_offsets) . "&#13;&#10;";
-	echo "2078: " . array_search("2078", $jump_call_offsets) . "&#13;&#10;";
+	echo "371: " . array_search("371", $jump_call_offsets) . "\n";//is offset in jump_calls
+	echo "436: " . array_search("436", $jump_call_offsets) . "\n";
+	echo "804: " . array_search("804", $jump_call_offsets) . "\n";
+	echo "2078: " . array_search("2078", $jump_call_offsets) . "\n";
 	
-	echo "&#13;&#10;";
+	echo "\n";
 	
-	echo "Jump Call Offsets 0: $jump_call_offsets[3]&#13;&#10;";
-	echo "Jump Call Offsets 1: $jump_call_offsets[4]&#13;&#10;";
-	echo "Jump Call Offsets 2: $jump_call_offsets[5]&#13;&#10;";
-	echo "Jump Call Offsets 3: $jump_call_offsets[6]&#13;&#10;";
-	echo "Jump Call Offsets 4: $jump_call_offsets[7]&#13;&#10;";
-	echo "Jump Call Offsets 5: $jump_call_offsets[8]&#13;&#10;";
-	echo "Jump Call Offsets 6: $jump_call_offsets[9]&#13;&#10;";
+	echo "Jump Call Offsets 0: $jump_call_offsets[3]\n";
+	echo "Jump Call Offsets 1: $jump_call_offsets[4]\n";
+	echo "Jump Call Offsets 2: $jump_call_offsets[5]\n";
+	echo "Jump Call Offsets 3: $jump_call_offsets[6]\n";
+	echo "Jump Call Offsets 4: $jump_call_offsets[7]\n";
+	echo "Jump Call Offsets 5: $jump_call_offsets[8]\n";
+	echo "Jump Call Offsets 6: $jump_call_offsets[9]\n";
 	
-	echo "Jump Call Offsets Count: " . count($jump_call_offsets) . "&#13;&#10;";*/
+	echo "Jump Call Offsets Count: " . count($jump_call_offsets) . "\n";*/
 	/* END DEBUG CODE */
-	
+		
 	//Free up memory - helps a lot
 	unset($script_bytes);
 	$string_sect = null;
@@ -1999,42 +1996,13 @@ EOT;
 	
 	
 //This ends the code parsing textarea
-echo <<<EOT
-<form method="post">
-<textarea id="codetextarea" name="content" rows="30" cols="80">
-$decompiled_output
-</textarea>
-</form>
-EOT;
-
-
+HTML_Code_textarea($decompiled_output);
 
 //create little textarea to display script errors
-if($script_errors[0] != null && $script_errors[1] != null){
-echo <<<EOT
-<br>
-<textarea rows="20" cols="50" spellcheck="false">
-
---Errors found in script--
-&#13;&#10;
-&#13;&#10;
-EOT;
-foreach($script_errors as $script_error){
-	echo $script_error . "&#13;&#10;";
-}
-echo "&#13;&#10;" . "If this is a stock Rockstar script, then something went wrong. If this is a custom XSC file, then it probably means some sneaky shit was pulled to prevent decompiling... but it was still decompiled!";
+if(!empty($script_errors)){
+HTML_Errors($script_errors);
 }
 
-
-echo <<<EOT
-</textarea>
-<br><br><br><br>
-</center>
-</td>
-</tr>
-</table>
-EOT;
-	
 	
 return;
 }
