@@ -173,10 +173,16 @@ function HTML_Upload_Section($html_return)
 				<form action="" method="post" enctype="multipart/form-data">
 					<div class="form-group">
 						<div style="float:left;width:49%;">
-							<label for="uploadedxsc">Script input</label>
+							<label for="upload_script">Script input</label>
 							<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
 							<input type="file" id="upload_script" name="upload_script">
 							<p class="help-block">*.csc, *xsc</p>
+							<div class="checkbox">
+								<label for="save_code">
+								<input type="checkbox" id="save_code" name="save_code" value="1">
+										Save the decompiled code instead of outputting.
+								</label>
+							</div>
 						</div>
 						<div class="clearfix"></div>
 						<br />
@@ -198,7 +204,7 @@ function HTML_Upload_Section($html_return)
 				</div>
 				<form action="" method="post" enctype="multipart/form-data">
 					<div class="form-group">
-						<label for="uploadedxsc">Script input</label>
+						<label for="upload_script_statics">Script input</label>
 						<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
 						<input type="file" id="upload_script_statics" name="upload_script_statics">
 						<p class="help-block">*.csc, *xsc</p>
@@ -223,13 +229,13 @@ function HTML_Upload_Section($html_return)
 				<form action="" method="post" enctype="multipart/form-data">
 					<div class="form-group">
 						<div style="float:left;width:49%;">
-							<label for="uploadedxsc">Script static template input</label>
+							<label for="upload_script_template">Script static template input</label>
 							<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
 							<input type="file" id="upload_script_template" name="upload_script_template">
 							<p class="help-block">*.csc, *xsc</p>
 						</div>
 						<div style="float:right;width:49%;">
-							<label for="uploadedxsc">Code input</label>
+							<label for="upload_code">Code input</label>
 							<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
 							<input type="file" id="upload_code" name="upload_code">
 							<p class="help-block">*.csa, *xsa</p>
@@ -251,19 +257,18 @@ function HTML_Upload_Section($html_return)
 
 }
 
-function HTML_Code_Section($script_sections, $HeaderValues)
+function HTML_Code_Section($HeaderValues)
 {
-	global $code_pages_count;
-
-	ob_implicit_flush(true);
-	ob_end_flush();
-
 	echo '
 				<div class="page-header">
 					<h1>Code - ' . number_format($HeaderValues['codelength']) . ' <i>bytes</i></h1>
 				</div>';
+}
 
-	parse_opcodes($script_sections);
+function HTML_Code_download($code_filename, $time)
+{
+	echo  '<a class="btn btn-primary btn-lg active" role="button" href="' . $code_filename . '">Download Code</a>
+					<p class="text-muted">Decompiled in ' . $time . ' seconds</p>';
 }
 
 function HTML_Code_textarea($decompiled_output, $time)
