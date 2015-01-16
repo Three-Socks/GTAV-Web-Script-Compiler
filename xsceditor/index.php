@@ -151,7 +151,7 @@ else if (isset($_FILES['upload_code'])
 			$xsc_final_filename = pathinfo($_FILES['upload_code']['name'], PATHINFO_FILENAME);
 			$xsc_final_filename = (strlen($xsc_final_filename) > 31) ? substr($xsc_final_filename,0, 31) : $xsc_final_filename;
 
-			//var_dump($xsc_final_filename);
+			//var_dump($code_lines);
 			//die();
 			
 			parse_code($code_lines, $statics_sect, $xsc_final_filename, $ext);
