@@ -266,7 +266,7 @@ function HTML_Code_Section($script_sections, $HeaderValues)
 	parse_opcodes($script_sections);
 }
 
-function HTML_Code_textarea($decompiled_output)
+function HTML_Code_textarea($decompiled_output, $time)
 {
 	echo '
 				<div class="row">
@@ -277,6 +277,7 @@ function HTML_Code_textarea($decompiled_output)
 							<p><button id="select-all-button" type="button" class="btn btn-primary" onfocus="var inp=document.getElementById(\'script_code\');setTimeout(function(){inp.select();},10);">Select All</button></p>
 						</div>
 					</form>
+				<p class="text-muted">Decompiled in ' . $time . ' seconds</p>
 				</div>';
 
 }

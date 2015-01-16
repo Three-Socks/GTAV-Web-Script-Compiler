@@ -170,7 +170,9 @@ function handle_pushstring($last_op, $last_op_end_buffer, $script_bytes, $string
 
 
 
-function parse_opcodes($script_sections){
+function parse_opcodes($script_sections){ 
+	$time_start = microtime(true);
+
 	$code_sect = $script_sections['code_sect'];
 	$string_sect = $script_sections['string_sect'];
 	$native_sect = $script_sections['native_sect'];
@@ -197,6 +199,7 @@ function parse_opcodes($script_sections){
 	$offsets_after_push = array();
 	$script_errors = array();
 	$buffer = 0;
+	$label_index = 0;
 	
 	while ($buffer < $script_bytes_total){
 		
@@ -221,8 +224,9 @@ function parse_opcodes($script_sections){
 			$temp[1] = $script_bytes[$buffer];
 			$buffer++;
 			$offset = Uint16toInt16(hexdec($temp[0] . $temp[1])) + $buffer;
-			if(array_search($offset, $jump_call_offsets) === false){
-				$jump_call_offsets[] = $offset;
+			if(!isset($jump_call_offsets[$offset])){
+				$jump_call_offsets[$offset] = $label_index;
+				$label_index++;
 			}
 			continue;
 		}
@@ -235,8 +239,9 @@ function parse_opcodes($script_sections){
 			$temp[2] = $script_bytes[$buffer];
 			$buffer++;
 			$offset = hexdec($temp[0] . $temp[1] . $temp[2]);
-			if(array_search($offset, $jump_call_offsets) === false){
-				$jump_call_offsets[] = $offset;
+			if(!isset($jump_call_offsets[$offset])){
+				$jump_call_offsets[$offset] = $label_index;
+				$label_index++;
 			}
 			continue;
 		}
@@ -258,8 +263,9 @@ function parse_opcodes($script_sections){
 				$temp[1] = $script_bytes[$buffer];
 				$buffer++;
 				$offset = Uint16toInt16(hexdec($temp[0] . $temp[1])) + $buffer;
-				if(array_search($offset, $jump_call_offsets) === false){
-					$jump_call_offsets[] = $offset;
+				if(!isset($jump_call_offsets[$offset])){
+				$jump_call_offsets[$offset] = $label_index;
+				$label_index++;
 				}
 			}
 			continue;
@@ -749,7 +755,7 @@ function parse_opcodes($script_sections){
 					$buffer++;
 					break;
 				default:
-					$script_errors[] = "Error - opcode:$opcode, buffer:$buffer\n";
+					$script_errors[] = "Error - opcode: " . $opcode . ", buffer: " . $buffer . "\n";
 					$buffer++;
 					break;
 			}//End Switch
@@ -770,10 +776,9 @@ function parse_opcodes($script_sections){
 	}//End While
 	$buffer = null;
 	
-	
 	array_unique($jump_call_offsets);
-	array_values($jump_call_offsets);
-	sort($jump_call_offsets);
+	//array_values($jump_call_offsets);
+	//sort($jump_call_offsets);
 	
 	$max_jumpcalls = count($jump_call_offsets);
 	
@@ -792,17 +797,14 @@ function parse_opcodes($script_sections){
 	$buffers_passed = array();
 	$opcodes_used = array();
 	$opcodes_offsets = array();
-	
+
 	while ($buffer < $script_bytes_total){  //Basically keep going until you run out of bytes in the code sect
 		
 		$buffers_passed[$b] = $buffer;
 		$b++;
-
-		$l = array_search($buffer, $jump_call_offsets);
-		if($l !== false){
-			$decompiled_output .= "\n:Label_$l\n";
-		}
-		$l = null;
+		
+		if (isset($jump_call_offsets[$buffer]))
+			$decompiled_output .= "\n:Label_" . $jump_call_offsets[$buffer] . "\n";
 		
 		//For PushString, if the current offset is a push before a pushstring, advance buffer past it
 		$ops_to_ignore_offsets_count = count($ops_to_ignore_offsets);
@@ -1511,12 +1513,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-         		for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1530,12 +1533,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1549,12 +1553,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1568,12 +1573,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1587,12 +1593,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1606,12 +1613,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1625,12 +1633,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1644,12 +1653,13 @@ function parse_opcodes($script_sections){
 				$linked[1] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = Uint16toInt16(hexdec($linked[0] . $linked[1])) + $buffer;
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1665,12 +1675,13 @@ function parse_opcodes($script_sections){
 				$linked[2] = $script_bytes[$buffer];
 				$buffer++;
 				$temp = hexdec($linked[0] . $linked[1] . $linked[2]);
-				for($i=0; $i<$max_jumpcalls; $i++){
-            		if($temp == $jump_call_offsets[$i]){
-              			$bytes_linked = "@Label_$i";
+         		//for($i=0; $i<$max_jumpcalls; $i++){
+            		//if($temp == $jump_call_offsets[$i]){
+								if (isset($jump_call_offsets[$temp])){
+              			$bytes_linked = "@Label_" . $jump_call_offsets[$temp];
                       	break;
             		}
-                }
+                //}
 				if(!isset($bytes_linked)){
 					$bytes_linked = "@off_$temp";
 				}
@@ -1749,13 +1760,12 @@ function parse_opcodes($script_sections){
 					$buffer++;
 					//Now figure out label
 					$temp1 = Uint16toInt16(hexdec($jumps[$j])) + $buffer;
-                  	$p = array_search($temp1, $jump_call_offsets);
-					if($p === false){
+					
+					if (isset($jump_call_offsets[$temp1]))
+						$labels[$l] = "@Label_" . $jump_call_offsets[$temp1];
+					else
 						$labels[$l] = "@off_$temp1";
-					}
-					else{
-						$labels[$l] = "@Label_$p";
-					}
+
 					$l++;
 					//continue to next loop
 					$c++;
@@ -1994,13 +2004,15 @@ EOT;
 	$native_sect = null;
 	free_memory();
 	
+$time_end = microtime(true);
+$time = $time_end - $time_start;
 	
 //This ends the code parsing textarea
-HTML_Code_textarea($decompiled_output);
+HTML_Code_textarea($decompiled_output, $time);
 
 //create little textarea to display script errors
 if(!empty($script_errors)){
-HTML_Errors($script_errors);
+	HTML_Errors($script_errors);
 }
 
 	
