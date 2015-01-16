@@ -275,471 +275,55 @@ function Read_Native_Section($HeaderValues, $xsc_hex){  //Reads Native Section -
 
 
 
-function Get_Text_Natives($raw_natives_name, $script_sections){
+function Get_Text_Natives($raw_natives_name, $raw_hashes_name, $script_sections){
 	$native_sect = $script_sections['native_sect'];
-	$text_natives_array = array();
+
 	//Read RawNatives
-	$handle = fopen($raw_natives_name, "rb");  
-	$raw_natives_contents = fread($handle, filesize($raw_natives_name));
-	fclose($handle);
+	$raw_natives_contents = file_get_contents($raw_natives_name);
+	$raw_hashes_contents = file_get_contents($raw_hashes_name);
 	
 	$raw_natives_array = array();
+	$raw_hashes_array = array();
+	$text_natives_array = array();
 	
-	$raw_natives_formatted = preg_replace("#\s+#",":",trim($raw_natives_contents));
-	$raw_natives_array = explode(":", $raw_natives_formatted);
+	$raw_natives_contents = str_replace("\r\n", "\n", $raw_natives_contents);
+	$raw_natives_array = explode("\n", $raw_natives_contents);
+
+	$raw_hashes_contents = str_replace("\r\n", "\n", $raw_hashes_contents);
+	$raw_hashes_array = explode("\n", $raw_hashes_contents);
 	
-	//Read script natives
+	unset($raw_natives_contents);
+	unset($raw_hashes_contents);
+	
 	$script_natives_hex = str_split($native_sect, 8);
-	$max = count($raw_natives_array);
-	
-	foreach($script_natives_hex as $native){
-		$dec_native = hexdec($native);
-		$i = 0;
 		
-		for($i=0; $i < $max; $i++){
-			if ($dec_native == $raw_natives_array[$i]){
-				$i++;
-				$native_text = $raw_natives_array[$i];
-				array_push($text_natives_array, $native_text);
-			}
-		}
-		if(!isset($native_text)){
-			$native_text = "unk_$native";
-			array_push($text_natives_array, $native_text);
-		}
-		$native_text = null;
-		$dec_native = null;
+	foreach($script_natives_hex as $script_native)
+	{
+		$key = array_search($script_native, $raw_hashes_array);
+		if ($key != false)
+			$text_natives_array[] = $raw_natives_array[$key];
+		else
+			$text_natives_array[] = "unk_" . $script_native;
 	}
+	
+	unset($raw_natives_array);
+	unset($raw_hashes_array);
+
 	return $text_natives_array;
 }
 
-
-
-function HTML_Start_Display($HeaderValues){
-
-//number of string / code pages
-global $string_pages_count;
-global $code_pages_count;
-//magic and globals version
-$filename = $HeaderValues['filename'];
-$magic = $HeaderValues['magic'];
-$globalsversion = $HeaderValues['globalsversion'];
-//code and string total length (all pages)
-$filesize = number_format($HeaderValues['filesize']);
-$codelength = number_format($HeaderValues['codelength']);
-$stringsize = number_format($HeaderValues['stringssize']);
-//Parameter, Statics, Globals, and Natives count
-$parametercount = number_format($HeaderValues['parametercount']);
-$staticscount = number_format($HeaderValues['staticscount']);
-$globalscount = number_format($HeaderValues['globalscount']);
-$nativescount = number_format($HeaderValues['nativescount']);
-
-
+function Read_Statics_Section($HeaderValues, $xsc_hex)
+{
+	$statics_offset = $HeaderValues['staticsoffset']*2;
+	$statics_count = $HeaderValues['staticscount'];
+	$bytes_to_read = $statics_count * 8;
 	
-echo <<< EOT
-<!DOCTYPE HTML>
-
-<head>
-<title>Hairy's XSC Viewer</title>
-<link rel="icon" type="img/ico" href="../favicon.ico">
-<link rel="stylesheet" type="text/css" href="../general/style.css">
-</head>
-
-<body>
-<center>
-
-
-<table background='../general/table_bg.jpg' width = '40%' height = '75px'>
-<tr width = '40%' height = '75px'>
-<td align='center' class='control_panel_cell'>
-<form method='link' action="../index.php"><input class='button_cp_main' type="submit" value="Upload File"></form>
-</td>
-<td align='center' class='control_panel_cell'>
-<form method='link' action="../xscuploads/"><input class='button_cp_uploadsmanager' type="submit" value="Uploads Manager"></form>
-</td>
-<td align='center' class='control_panel_cell'>
-<form method='link' action="../secure/logview.php"><input class='button_cp_logviewer' type="submit" value="Log Viewer"></form>
-</td>
-</tr>
-</table>
-
-
-
-
-<br><br><br><br><br>
-
-<table background='../general/table_bg.jpg' width = '50%' height = '75px'>
-
-<tr width = '50%' height = '75px'>
-<td>
-<center>
-<p><b><font color='39b7cd'>File Name:</font> <i><font color='bcc6cc'>$filename</font></i></b></p>
-</center>
-</td>
-
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Magic:</font> <i><font color='bcc6cc'>$magic</font></i></b></p>
-</center>
-</td>
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Globals Version:</font> <i><font color='bcc6cc'>$globalsversion</font></i></b></p>
-</center>
-</td>
-
-
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Filesize:</font> <i><font color='bcc6cc'>$filesize bytes</font></i></b></p>
-</center>
-</td>
-
-</tr>
-</table>
-
-<br><br>
-
-
-<table background='../general/table_bg.jpg' width = '50%' height = '75px'>
-
-<tr width = '50%' height = '75px'>
-<td>
-<center>
-<p><b><font color='39b7cd'>Code Pages:</font> <i><font color='bcc6cc'>$code_pages_count</font></i></b></p>
-</center>
-</td>
-
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>String Pages:</font> <i><font color='bcc6cc'>$string_pages_count</font></i></b></p>
-</center>
-</td>
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Native Pages:</font> <i><font color='bcc6cc'> 1 </font></i></b></p>
-</center>
-</td>
-
-</tr>
-
-<tr width = '50%' height = '75px'>
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Code Size:</font> <i><font color='bcc6cc'>$codelength bytes</font></i></b></p>
-</center>
-</td>
-
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>String Size:</font> <i><font color='bcc6cc'>$stringsize bytes</font></i></b></p>
-</center>
-</td>
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Natives Count:</font> <i><font color='bcc6cc'>$nativescount</font></i></b></p>
-</center>
-</td>
-
-</tr>
-</table>
-
-
-<br><br>
-
-
-<table background='../general/table_bg.jpg' width = '50%' height = '75px'>
-
-<tr width = '50%' height = '75px'>
-<td>
-<center>
-<p><b><font color='39b7cd'>Parameter Count:</font> <i><font color='bcc6cc'>$parametercount</font></i></b></p>
-</center>
-</td>
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Globals Count:</font> <i><font color='bcc6cc'>$globalscount</font></i></b></p>
-</center>
-</td>
-
-
-<td>
-<center>
-<p><b><font color='39b7cd'>Statics Count:</font> <i><font color='bcc6cc'>$staticscount</font></i></b></p>
-</center>
-</td>
-
-
-</tr>
-</table>
-
-<br><br><br><br><br><br><br><br>
-
-EOT;
-
-return;
+	$statics_sect = substr($xsc_hex, $statics_offset, $bytes_to_read); //Raw Static Sect
+	$statics_array = str_split($statics_sect, 8);  //Statics in array, hex form
 	
-}
-
-
-
-function HTML_Code_Section($script_sections, $HeaderValues){
-
-global $code_pages_count; //Grab global var so we can decide if it's too large to parse
-
-$code_sect = $script_sections['code_sect'];
-$codelength = number_format($HeaderValues['codelength']);
-
-
-ob_implicit_flush(true);
-ob_end_flush();
-
-
-echo <<<EOT
-
-<br><br>
-
-<table background='../general/table_bg.jpg' width = '50%'>
-
-<tr width = '50%'>
-
-<td align = 'center'>
-
-<center><h2><b><font color='39b7cd'>Code Block -</font> <font color='bcc6cc'>$codelength <i>bytes</i></font></b></h2>
-EOT;
-
-/*
-if($code_pages_count > 4){               //Basically if the script is more than 4 pages,
-	echo $code_sect;                     //dont parse code or else it will freeze - php cant
-}else{                                   //handle it. But if it's under 4 pages, we'll go ahead
-	parse_opcodes($script_sections);	 //and parse it
-}
-*/
-
-
-parse_opcodes($script_sections);
-
-return;
+	return $statics_array;
 
 }
-
-
-
-
-function HTML_Native_Section($script_sections, $HeaderValues, $raw_natives_name){
-	$native_sect = $script_sections['native_sect'];
-	$natives_count = number_format($HeaderValues['nativescount']);
-	
-	//This code reads RawNatives file
-	$handle = fopen($raw_natives_name, "rb");  
-	$raw_natives_contents = fread($handle, filesize($raw_natives_name));
-	fclose($handle);
-	
-	$raw_natives_array = array();
-	
-	$raw_natives_formatted = preg_replace("#\s+#",":",trim($raw_natives_contents));
-	$raw_natives_array = explode(":", $raw_natives_formatted);
-	
-	//$raw_natives_array is [0] hash, [1] native name, [2] useless number
-	
-//Begin HTML
-echo <<<EOT
-<table background='../general/table_bg.jpg' width = '50%'>
-
-<tr width = '50%'>
-
-<td align = 'center'>
-
-<center><h2><b><font color='39b7cd'>Native Block -</font> <font color='bcc6cc'>$natives_count <i>natives</i></font></b></h2>
-<textarea rows="20" cols="50" spellcheck="false">
-EOT;
-	
-	//Now split up the Natives from the script into 8 byte sections
-	$script_natives_hex = str_split($native_sect, 8);
-	$max = count($raw_natives_array);
-	
-	if($natives_count == '0'){
-		echo "No Natives Found In This Script";
-		goto skipnatives;
-	}
-	
-	foreach($script_natives_hex as $native){
-		$dec_native = hexdec($native);
-		$i = 0;
-		
-		for($i=0; $i < $max; $i++){
-			if ($dec_native == $raw_natives_array[$i]){
-				$i++;
-				$native_text = $raw_natives_array[$i];
-				echo "$native_text";
-				echo "&#13;&#10;";
-			}
-		}
-		if($native_text == null){
-			$native_text = "unk_$dec_native";
-			echo "$native_text";
-			echo "&#13;&#10;";
-		}
-		
-		$native_text = null;
-		$dec_native = null;
-		
-	}
-	
-	skipnatives:
-	
-	
-	$native_sect = null;
-	unset($raw_natives_array);
-	unset($script_natives_hex);
-	
-//End HTML
-echo <<<EOT
-</textarea>
-
-<br><br><br><br>
-
-</center>
-</td>
-</tr>
-</table>
-
-EOT;
-
-
-
-return;
-
-}
-
-
-function HTML_String_Section($script_sections, $HeaderValues){
-	$string_sect = $script_sections['string_sect'];
-	
-	$stringssize = number_format($HeaderValues['stringssize']);//Could be used for display, but we show # of strings instead
-	$string_sect_length = strlen($string_sect);//Actually used for code
-	
-	$string_sect = str_replace("00000000000000000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("000000000000000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("0000000000000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("00000000000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("000000000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("0000000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("00000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("000000000000000000", "00", $string_sect);
-	$string_sect = str_replace("0000000000000000", "00", $string_sect);
-	$string_sect = str_replace("00000000000000", "00", $string_sect);
-	$string_sect = str_replace("000000000000", "00", $string_sect);
-	$string_sect = str_replace("0000000000", "00", $string_sect);
-	$string_sect = str_replace("00000000", "00", $string_sect);
-	$string_sect = str_replace("000000", "00", $string_sect);
-	$string_sect = str_replace("0000", "00", $string_sect); //Above code just gets rid of blanks
-	
-	$number_of_strings_total = number_format(substr_count($string_sect, "00")); //Could be used to display approx # of strings
-	
-	//Start HTML
-echo <<<EOT
-<table background='../general/table_bg.jpg' width = '50%'>
-
-<tr width = '50%'>
-
-<td align = 'center'>
-
-<center><h2><b><font color='39b7cd'>String Block -</font> <font color='bcc6cc'>$stringssize <i>bytes</i></font></b></h2>
-<textarea rows="20" cols="60" spellcheck="false">
-EOT;
-
-	if ($string_sect == "No Strings Found In This Script"){ //This checks if string sect is null and just displays null text - yes, some scripts dont have string sections :?
-		echo $string_sect;
-		goto finishHTML;
-	}
-	
-	$buffer = 0;
-	
-	while($buffer <= $string_sect_length){
-	
-		$byte_not_null = true;
-		$i = 0;
-		
-		while($byte_not_null == true){
-			$byte = substr($string_sect, $buffer, 2);
-			if($byte == '00'){
-				$byte_not_null = false;
-				$string = Hex_to_Text(implode("", $bytes));
-				echo "$string";
-				echo "&#13;&#10;";
-				unset($bytes);
-				$string = null;
-				$byte = null;
-			}else{
-				if($buffer >= $string_sect_length){
-					goto breakloop;
-				}
-				$bytes[$i] = $byte;
-				$byte = null;
-				$i++;
-			}
-			$buffer = $buffer + '2';
-		}
-	}
-	breakloop:
-	
-	$string_sect = null;
-	
-//Finish HTML
-finishHTML:
-echo <<<EOT
-</textarea>
-
-<br><br><br><br>
-
-</td>
-</tr>
-</table>
-
-EOT;
-
-return;
-
-}
-
-
-function End_HTML(){
-echo <<<EOT
-
-<br><br><br><br>
-
-</center>
-
-</body>
-</html>
-
-EOT;
-
-return;
-}
-
-
-
-
-
 
 function Parse_Script_Sections($HeaderValues, $xsc_hex){  //Call on the 3 funcs above - create code_sect, string_sect, and native_sect
 	$script_sections = array();
@@ -747,19 +331,14 @@ function Parse_Script_Sections($HeaderValues, $xsc_hex){  //Call on the 3 funcs 
 	$code_sect = Read_Code_Pages($HeaderValues, $xsc_hex);  //Raw Code Pages in hex
 	$string_sect = Read_String_Pages($HeaderValues, $xsc_hex);  //Raw string pages in hex
 	$native_sect = Read_Native_Section($HeaderValues, $xsc_hex);  //Raw native section in hex
+	$statics_sect = Read_Statics_Section($HeaderValues, $xsc_hex);  //Raw statics section in hex
 	
 	$script_sections['code_sect'] = $code_sect;
 	$script_sections['string_sect'] = $string_sect;
 	$script_sections['native_sect'] = $native_sect;
+	$script_sections['statics_sect'] = $statics_sect;
 	
 	return $script_sections;
 }
-
-
-
-
-
-
-
 
 ?>

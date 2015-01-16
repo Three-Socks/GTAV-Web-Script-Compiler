@@ -1,18 +1,10 @@
 <?php
 
-
-
-
-
 /*
 
 General Functions used in both Decompiling and Compiling
 
 */
-
-
-
-
 
 
 function Hex_to_Dec($hexvalue){
@@ -22,9 +14,7 @@ function Hex_to_Dec($hexvalue){
 }
 
 function Hex_to_Text($hexvalue){
-	$return = null;
-	for($i=0;$i<strlen($hexvalue);$i+=2) $return .= chr(hexdec(substr($hexvalue,$i,2)));
-	return $return;
+	return pack("H*" , $hexvalue);
 }
 
 

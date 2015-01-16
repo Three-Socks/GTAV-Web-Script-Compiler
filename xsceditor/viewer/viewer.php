@@ -1,6 +1,6 @@
 <?php
 
-ini_set('memory_limit','2000M');
+ini_set('memory_limit','500M');
 //ini_set('display_errors', 'on');
 set_time_limit(0);
 ini_set('implicit_flush',1);
@@ -13,32 +13,18 @@ set_time_limit(0);
 
 
 //GRAB POST VALUES
-if($_POST["uploadedfilename"] != ''){
+/* if($_POST["uploadedfilename"] != ''){
 	$xsc_filename = "../xscuploads/" . $_POST["uploadedfilename"];
 }
 else{
 	header("Location: http://localhost/xsceditor");
 }
-
+ */
 
 //include necessary decompile files
 include 'gen_functions.php';
 include 'viewer_functions.php';
 include 'opcode_switch.php';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //The following function controls the entire decompiling process
 
@@ -55,53 +41,23 @@ function Main($xsc_filename){
 	
 	free_memory();
 	HTML_Start_Display($HeaderValues);  //Displays all the values except code/string/natives
+	HTML_Script_Info_Section($HeaderValues);
 	free_memory();
 	flush();
 	HTML_Code_Section($script_sections, $HeaderValues); //Code parse and display
 	free_memory();
 	flush();
-	HTML_Native_Section($script_sections, $HeaderValues, "../general/RawNatives.txt"); //native parse/display
+	HTML_Native_Section($script_sections, $HeaderValues, "general/RawNatives.txt", "general/RawHashes.txt"); //native parse/display
 	free_memory();
 	flush();
 	HTML_String_Section($script_sections, $HeaderValues); //string parse/display
 	free_memory();
 	flush();
-	
-	
-echo <<<EOT
+	HTML_Statics_Section($script_sections, $HeaderValues); //string parse/display
+	free_memory();
+	flush();
+	HTML_End_Display();
 
-<br><br><br><br>
-
-</center>
-
-<script language="javascript" type="text/javascript" src="../editarea/edit_area/edit_area_full.js"></script>
-<script language="javascript" type="text/javascript">
-editAreaLoader.init({
-	id : "codetextarea"
-	,syntax: "xsc-asm"
-	,start_highlight: true
-});
-</script>
-
-</body>
-</html>
-
-EOT;
-	
-	
 }
-
-
-
-
-//Start of the script
-Main($xsc_filename);
-
-
-
-
-
-
-//Any quick debug code goes below this line
 
 ?>
