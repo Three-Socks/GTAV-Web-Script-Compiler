@@ -1017,7 +1017,7 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 	
 	//Make sure output is a multiple of 4,096 or 8,192 or 12,288, or 16,384
 	$hex_length = strlen($hex) / 2;
-	
+		
 	if($script_ext == "xsa"){
 		//XSC RSC7 Headers
 		
@@ -1046,7 +1046,39 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 	}
 	else
 	{
-		if($hex_length <= 8000){
+		$csc_rsc7_headers = array(
+			array(
+				'size' => 4096,
+				'flag' => "00020000"
+			),
+			array(
+				'size' => 8192,
+				'flag' => "00040000"
+			),
+			array(
+				'size' => 16384,
+				'flag' => "00000080"
+			),
+			array(
+				'size' => 32000,
+				'flag' => "00000020"
+			),
+		);
+		
+		foreach ($csc_rsc7_headers as $header)
+		{
+			if ($hex_length <= $header['size'] - 32)
+			{
+				while(strlen($hex)/2 < $header['size'])
+				{
+					$hex = $hex . "00";
+					$rscheader['systemflag'] = $header['flag'];
+				}
+				break;
+			}
+		}
+
+		/*if($hex_length <= 8000){
 			//Extend hex to 8,192 bytes
 			while(strlen($hex)/2 < 8192){
 				$hex = $hex . "00";
@@ -1066,15 +1098,16 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 				$hex = $hex . "00";
 				$rscheader['systemflag'] = "00000080";
 			}
-		}
+		}*/
 		$file_ext = ".csc";
 	}
 	
 	//Create RSC7 Header String Separate from file. Display on next page
 	$rscheader['graphicsflag'] = "90000000";
 	$libv_header = implode("", $rscheader);
-		
 	
+	$hex = $libv_header . $hex;
+
 	$label_decs_u = array_unique($label_decs);
 	$label_decs_same = array_diff($label_decs, array_diff($label_decs_u, array_diff_assoc($label_decs, $label_decs_u)));
 
