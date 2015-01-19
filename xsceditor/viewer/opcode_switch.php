@@ -1933,7 +1933,7 @@ function parse_opcodes($script_sections, $filename, $ext){
 				<script type='text/javascript'>
 				document.getElementById('progress_bar').style.width = '$perc'+'%';
 				document.getElementById('progress_bar').setAttribute('aria-valuenow', '$perc')
-				document.getElementById('progress_bar').innerHTML = '<span class="sr-only">$percent Complete</span>';
+				document.getElementById('progress_bar').innerHTML = '<span>$percent Complete</span>';
 				</script>
 EOT;
 			}else{
@@ -1941,7 +1941,7 @@ EOT;
 				<script type='text/javascript'>
 				document.getElementById('progress_bar').style.width = '100'+'%';
 				document.getElementById('progress_bar').setAttribute('aria-valuenow', '100')
-				document.getElementById('progress_bar').innerHTML = '<span class="sr-only">Done!</span>';
+				document.getElementById('progress_bar').innerHTML = '<span>Done!</span>';
 				</script>
 EOT;
 			}
@@ -1958,7 +1958,7 @@ EOT;
 				<script type='text/javascript'>
 				document.getElementById('progress_bar').style.width = '100'+'%';
 				document.getElementById('progress_bar').setAttribute('aria-valuenow', '100')
-				document.getElementById('progress_bar').innerHTML = '<span class="sr-only">Done!</span>';
+				document.getElementById('progress_bar').innerHTML = '<span>Done!</span>';
 				</script>
 EOT;
 	
