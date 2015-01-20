@@ -1014,82 +1014,22 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 	$rscheader = array();
 	$rscheader['magic'] = "52534337";
 	$rscheader['version'] = "00000009";
-		
-	//Make sure output is a multiple of 4,096 or 8,192 or 12,288, or 16,384
+
 	$hex_length = strlen($hex) / 2;
-		
-	if($script_ext == "xsa"){
-		//XSC RSC7 Headers
-		
-		if($hex_length <= 8000){
-			//Extend hex to 8,192 bytes
-			while(strlen($hex)/2 < 8192){
-				$hex = $hex . "00";
-				$rscheader['systemflag'] = "00020000";
-			}
-		}
-		else if($hex_length > 8000 && $hex_length <= 16000){
-			//Extend hex to 16,384 bytes
-			while(strlen($hex)/2 < 16384){
-				$hex = $hex . "00";
-				$rscheader['systemflag'] = "00000800";
-			}
-		}
-		else if($hex_length > 16000 && $hex_length <= 32000){
-			//Extend hex to 32,768 bytes
-			while(strlen($hex)/2 < 32768){
-				$hex = $hex . "00";
-				$rscheader['systemflag'] = "00000080";
-			}
-		}
-		$file_ext = ".xsc";
-	}
-	else
-	{
-		$csc_rsc7_headers = array(
-			array(
-				'size' => 4096,
-				'flag' => "00020000"
-			),
-			array(
-				'size' => 8192,
-				'flag' => "00040000"
-			),
-			array(
-				'size' => 16384,
-				'flag' => "00000080"
-			),
-			array(
-				'size' => 32768,
-				'flag' => "00000020"
-			),
-			array(
-				'size' => 49152,
-				'flag' => "000000A0"
-			),
-			array(
-				'size' => 57344,
-				'flag' => "000008A0"
-			),
-		);
 
-		foreach ($csc_rsc7_headers as $header)
-		{
-			if ($hex_length <= $header['size'] - 32)
-			{
-				while(strlen($hex)/2 < $header['size'])
-				{
-					$hex = $hex . "00";
-					$rscheader['systemflag'] = $header['flag'];
-				}
-				break;
-			}
-		}
+	$file_basesize = $script_ext == "csa" ? 4096 : 8192;
+	$rounded_length = (int) ceil($hex_length / $file_basesize) * $file_basesize;
 
-		$file_ext = ".csc";
-	}
+	$hex .= str_repeat("00", $rounded_length - $hex_length);
 	
-	//Create RSC7 Header String Separate from file. Display on next page
+	$hex_length = strlen($hex) / 2;
+
+	$systemflag = dechex(GetFlagFromSize($hex_length, $file_basesize));
+	
+	$rscheader['systemflag'] = str_pad($systemflag, 8, '0', STR_PAD_LEFT);
+	
+	$file_ext = $script_ext == "csa" ? ".csc" : ".xsc";
+	
 	$rscheader['graphicsflag'] = "90000000";
 	$libv_header = implode("", $rscheader);
 	
