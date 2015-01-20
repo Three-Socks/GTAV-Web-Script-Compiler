@@ -2,6 +2,7 @@
 
 function HTML_Start_Display()
 {
+	global $installUrl;
 
 	echo '<!DOCTYPE html>
 	<html lang="en">
@@ -15,15 +16,15 @@ function HTML_Start_Display()
 
 			<title>CSC/XSC Compiler</title>
 
-			<link rel="icon" type="img/ico" href="/xsceditor/favicon.ico">
+			<link rel="icon" type="img/ico" href="' . $installUrl . '/favicon.ico">
 
 			<!-- Bootstrap core CSS -->
-			<link href="/xsceditor/theme/bootstrap-dist/css/bootstrap.min.css" rel="stylesheet">
+			<link href="' . $installUrl . '/theme/bootstrap-dist/css/bootstrap.min.css" rel="stylesheet">
 			<!-- Bootstrap theme -->
-			<link href="/xsceditor/theme/bootstrap-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+			<link href="' . $installUrl . '/theme/bootstrap-dist/css/bootstrap-theme.min.css" rel="stylesheet">
 
 			<!-- Custom styles for this template -->
-			<link href="/xsceditor/theme/theme.css" rel="stylesheet">
+			<link href="' . $installUrl . '/theme/theme.css" rel="stylesheet">
 			
 			<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 			<!--[if lt IE 9]>
@@ -43,11 +44,11 @@ function HTML_Start_Display()
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" href="/xsceditor/">CSC/XSC Decompiler/Compiler</a>
+						<a class="navbar-brand" href="' . $installUrl . '/">CSC/XSC Decompiler/Compiler</a>
 					</div>
 					<div id="navbar" class="navbar-collapse collapse">
 						<ul class="nav navbar-nav">
-							<li class="active"><a href="/xsceditor/">Home</a></li>
+							<li class="active"><a href="' . $installUrl . '/">Home</a></li>
 						</ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -503,6 +504,8 @@ function HTML_Statics_Edit($statics_sect, $HeaderValues, $script_filename, $scri
 
 function HTML_End_Display()
 {
+	global $installUrl;
+
 	echo '
     </div> <!-- /container -->
 
@@ -511,7 +514,7 @@ function HTML_End_Display()
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="/xsceditor/theme/bootstrap-dist/js/bootstrap.min.js"></script>
+    <script src="' . $installUrl . '/theme/bootstrap-dist/js/bootstrap.min.js"></script>
   </body>
 </html>';
 }
