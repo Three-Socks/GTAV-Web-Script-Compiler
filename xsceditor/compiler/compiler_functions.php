@@ -245,8 +245,8 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 			case "callnative"://4 (special)
 				$bytes[] = "2c";
 				//Get Native Hex Hash
-				if(substr_count($line_parts[1], "UNK_") > 0){//if it's a UNK_
-					$hash = str_replace('"', '', str_replace("UNK_", "", $line_parts[1]));
+				if(substr_count(strtoupper($line_parts[1]), "UNK_") > 0){//if it's a UNK_
+					$hash = str_ireplace(array('"', "unk_0x", "UNK_"), "", $line_parts[1]);
 				}else{//else if it's a normal native name
 					$hash = hash('joaat', strtolower(str_replace('"', '', $line_parts[1])));//Native
 				}
@@ -1014,7 +1014,7 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 	$rscheader = array();
 	$rscheader['magic'] = "52534337";
 	$rscheader['version'] = "00000009";
-	
+		
 	//Make sure output is a multiple of 4,096 or 8,192 or 12,288, or 16,384
 	$hex_length = strlen($hex) / 2;
 		
@@ -1060,11 +1060,19 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 				'flag' => "00000080"
 			),
 			array(
-				'size' => 32000,
+				'size' => 32768,
 				'flag' => "00000020"
 			),
+			array(
+				'size' => 49152,
+				'flag' => "000000A0"
+			),
+			array(
+				'size' => 57344,
+				'flag' => "000008A0"
+			),
 		);
-		
+
 		foreach ($csc_rsc7_headers as $header)
 		{
 			if ($hex_length <= $header['size'] - 32)
@@ -1078,27 +1086,6 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 			}
 		}
 
-		/*if($hex_length <= 8000){
-			//Extend hex to 8,192 bytes
-			while(strlen($hex)/2 < 8192){
-				$hex = $hex . "00";
-				$rscheader['systemflag'] = "00020000";
-			}
-		}
-		else if($hex_length > 8000 && $hex_length <= 16000){
-			//Extend hex to 16,384 bytes
-			while(strlen($hex)/2 < 16384){
-				$hex = $hex . "00";
-				$rscheader['systemflag'] = "00000080";
-			}
-		}
-		else if($hex_length > 16000 && $hex_length <= 32000){
-			//Extend hex to 32,768 bytes
-			while(strlen($hex)/2 < 16384){
-				$hex = $hex . "00";
-				$rscheader['systemflag'] = "00000080";
-			}
-		}*/
 		$file_ext = ".csc";
 	}
 	
