@@ -6,6 +6,7 @@ error_reporting(E_ALL ^ E_STRICT);
 
 include 'theme/theme.php';
 
+$installUrl = 'http://localhost/xsceditor';
 $upload_error = '';
 
 if (isset($_FILES['upload_script'])
