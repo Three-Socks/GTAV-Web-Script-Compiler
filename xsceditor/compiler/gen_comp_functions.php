@@ -118,12 +118,6 @@ function Create_Push_Before_PushString($offset){
 	return $ret;
 }
 
-
-
-
-
-
-
 function Parse_Switch($switch){
 	
 	$parts = array();
@@ -189,8 +183,6 @@ return $ret;
 
 }
 
-
-
 function create_pointer_from_offset($pointer){
 	
 	$pointer = str_pad($pointer, 8, '0', STR_PAD_LEFT);
@@ -200,7 +192,6 @@ function create_pointer_from_offset($pointer){
 	return $pointer;
 
 }
-
 
 function Signed_Dec_to_Hex($number)
 {
@@ -215,7 +206,6 @@ function Signed_Dec_to_Hex($number)
     return $hexval;
 }
 
-
 function Int16toUint16($value)
 {
  if ($value < 0)
@@ -223,6 +213,34 @@ function Int16toUint16($value)
   $value += 65536;
  }
  return $value;
+}
+
+function GetSizeFromFlag($flag, $baseSize)
+{
+	$baseSize <<= (int)($flag & 0xf);
+	$size = (int)(((($flag >> 17) & 0x7f) + ((($flag >> 11) & 0x3f) << 1) + ((($flag >> 7) & 0xf) << 2) + ((($flag >> 5) & 0x3) << 3) + ((($flag >> 4) & 0x1) << 4)) * $baseSize);
+	for ($i = 0; $i < 4; $i++) {
+			$size += ((($flag >> (24 + $i)) & 1) == 1) ? ($baseSize >> (1 + $i)) : 0;
+	}
+	return  $size;
+}
+
+
+function GetFlagFromSize($size, $baseSize)
+{
+	global $return_html;
+
+	if ($size % $baseSize != 0)
+	{
+		$return_html .= 'Unable to set RSC7 header size.';
+		return 0;
+	}
+
+	for ($i = 0; $i < 0x7FFFFFFF; $i++)
+	{
+		if (GetSizeFromFlag($i, $baseSize) == $size)
+				return $i;
+	}
 }
 
 ?>
