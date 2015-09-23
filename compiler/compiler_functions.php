@@ -3,7 +3,9 @@
 /*       This file is the main XSC Compiling Script        */
 
 
-function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext){
+function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
+{
+	global $return_html;
 	
 	$bytes = array(); //store final product in here to return
 	
@@ -227,7 +229,7 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 			case "fpush"://5
 				$bytes[] = "29";
 				//Convert to 32 bit hex. Every 2 chars into array key
-				$temp[0] = Float2Hex($line_parts[1]);
+				$temp[0] = isset($line_parts[1]) ? Float2Hex($line_parts[1]) : Float2Hex(0.0);
 				$arr = array();
 				$arr = str_split(str_pad($temp[0], 8, '0', STR_PAD_LEFT), 2);
 				$bytes[] = $arr[0];
@@ -405,7 +407,7 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 				$bytes[] = $arr[1];
 				unset($arr);
 				break;
-			case "getstackimmediatep2"://3
+			case "getimmediatep2"://3
 				$bytes[] = "46";
 				$temp[0] = dechex($line_parts[1]);
 				$arr = array();
@@ -780,7 +782,7 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 				$bytes[] = str_pad(preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $line_parts[1]), 2, '0', STR_PAD_LEFT);
 				break;
 			default:
-				$return_html .= "<p class=\"bg-danger\">Compile error! Unk opcode: $opcode</p>";
+				$return_html .= "<p class=\"bg-danger\">Compile error! Unk opcode: \"$opcode\"<br />" . $code_lines[$i-1] . "<br />" . $code_lines[$i] . " &nbsp;<-----<br />" . $code_lines[$i+1] . "</p>";
 		}
 		//Still do CallNative, PushString, and Switch
 		
@@ -901,10 +903,10 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 	
 	//Create Header. Header is 80 bytes.
 	$HeaderValues = array();
-	$HeaderValues['magic'] = "34274500";
+	$HeaderValues['magic'] = "B43A4500";
 	$HeaderValues['unk1'] = "";//Pointer to 01 at end of file
 	$HeaderValues['codepagesoffset'] = "";//Pointer to code pages at end of file
-	$HeaderValues['globalsversion'] = "11cd39a2";
+	$HeaderValues['globalsversion'] = "FF448AC7";
 	$HeaderValues['codelength'] = str_pad(dechex($code_sect_length), 8, '0', STR_PAD_LEFT);
 	$HeaderValues['parametercount'] = "00000000";
 	$HeaderValues['staticscount'] = str_pad(dechex($static_count), 8, '0', STR_PAD_LEFT);
@@ -962,10 +964,23 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 	//location of code block pointer
 	$codeblocks_pointer_loc = $filelength_so_far + 32;
 	//code block pointer
+
+	//var_dump(dechex($codeblocks));
+	//die();
 	$codeblocks = "50000050";
 	while((strlen($codeblocks) / 2) < 16){
 		$codeblocks = $codeblocks . "00";
 	}
+	//var_dump(dechex($code_sect_so_far+80));
+	//die();
+	//$codePages_len = $code_sect_length + 16384 - 1 >> 14;
+	//$codePages = array();
+
+	//for ($i = 0; $i < $codePages_len; $i++)
+		//$codePages[$i] = (reader.ReadInt() & 16777215) + XSCGlobals.BaseOffset;
+
+	//var_dump($codePages);
+	//die();
 	$final_section['codeblocks'] = $codeblocks;
 	
 	//location of string block pointer
@@ -1048,22 +1063,15 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 		}
 	}
 		
-	if (!empty($return_html))
+	if (empty($return_html))
 	{
-		HTML_Start_Display();
-
-		HTML_Upload_Section($return_html);
-
-
-		HTML_End_Display();
-	}
-	else
-	{
+		file_put_contents('/home/3s/logs/compile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $xsc_final_filename . $file_ext . "\n", FILE_APPEND);
 		ob_clean();
 		
 		header('Content-Type: application/octet-stream');
 		header("Content-Disposition: attachment; filename=\"" . $xsc_final_filename . $file_ext ."\"");
 		echo pack('H*', $hex);
+		exit;
 	}
 }
 

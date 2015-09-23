@@ -52,3 +52,11 @@ body {
         border-top-right-radius: 0;
     }
 }
+
+.cheat_hasher_buttons {
+	width: 25%;
+}
+
+.cheat_hasher_buttons img {
+	width: 42px;
+}

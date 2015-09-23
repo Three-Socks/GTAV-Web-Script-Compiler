@@ -341,4 +341,9 @@ function Parse_Script_Sections($HeaderValues, $xsc_hex){  //Call on the 3 funcs 
 	return $script_sections;
 }
 
+
+function mround($val, $f=2, $d=6){
+    return sprintf("%".$d.".".$f."f", $val);
+}
+
 ?>

@@ -1,0 +1,7049 @@
+Function 0 2 0
+Call @menu_setup
+Call @modmanager_setup
+
+CallNative "network_set_script_is_safe_for_network_game" 0 0
+
+:while
+push_1
+JumpFalse @Label_main_end
+push_0
+CallNative "wait" 1 0
+
+Call @menu_terminate_hotfix_script
+Call @modmanager_loop_checks
+Call @modmanager_catch_load_button_press
+
+Call @menu_get_open_state
+JumpFalse @Label_main_2
+
+Call @menu_modify_game_state
+push_0
+Call @menu_get_action_mode
+JumpNE @Label_main_3
+Call @menu_catch_button_press
+Call @menu_catch_select_button_press
+Call @modmanager_catch_button_press
+
+:Label_main_3
+Call @menu_action
+Call @menu_set_frontend
+
+StaticGet1 11
+Not
+JumpFalse @Label_main_draw
+Call @menu_set
+push_0
+Call @menu_get_action_mode
+JumpNE @Label_main_draw
+
+push_2
+Push1 175
+CallNative "is_disabled_control_just_released" 2 1
+dup
+Not
+JumpFalse @Label_main_set_last_or
+push_1
+StaticGet2 378
+CmpEq
+Or
+
+:Label_main_set_last_or
+JumpFalse @Label_main_draw
+push_0
+StaticSet2 378
+Call @menu_set_last_selected
+
+:Label_main_draw
+Call @menu_draw_frontend
+Call @menu_draw_window
+Call @menu_draw
+Call @menu_load_sprite
+CallNative "UNK_3FE33BD6" 0 0
+
+:Label_main_2
+Jump @while
+
+:Label_main_end
+Return 0 0
+
+:menu_terminate_hotfix_script
+Function 0 4 0
+
+PushString "valentinerpreward2"
+CallNative "get_hash_key" 1 1
+CallNative "UNK_029D3841" 1 1
+push_0
+JumpLE @Label_menu_terminate_hotfix_script_end
+PushString "valentinerpreward2"
+CallNative "terminate_all_scripts_with_this_name" 1 0
+
+:Label_menu_terminate_hotfix_script_end
+Return 0 0
+
+:modmanager_loop_checks
+Function 0 3 0
+
+CallNative "player_id" 0 1
+CallNative "is_player_playing" 1 1
+JumpFalse @Label_modmanager_loop_checks_end
+
+CallNative "player_ped_id" 0 1
+CallNative "does_entity_exist" 1 1
+JumpFalse @Label_modmanager_loop_checks_end
+
+:Label_modmanager_loop_checks_end
+Return 0 0
+
+:modmanager_catch_load_button_press
+Function 0 4 0
+
+Call @menu_get_open_state
+JumpFalse @Label_catch_load_2
+StaticGet1 19
+Push1 8
+JumpLE @Label_catch_load_2
+Call @menu_get_current_item
+Call @menu_get_current_level
+pstatic2 61
+ArraySet1 1
+Call @menu_clean
+
+PushString "CANCEL"
+Call @menu_play_sound
+
+Call @menu_shutdown
+
+:Label_catch_load_2
+Call @menu_get_open_state
+Not
+JumpFalse @Label_catch_load_4
+StaticGet1 8
+Push1 8
+JumpLE @Label_catch_load_4
+
+CallNative "player_ped_id" 0 1
+CallNative "is_ped_going_into_cover" 1 1
+dup
+Not
+JumpFalse @Label_catch_load_cover_or
+CallNative "player_ped_id" 0 1
+CallNative "is_ped_jumping" 1 1
+Or
+
+:Label_catch_load_cover_or
+JumpFalse @Label_catch_load_cover
+CallNative "player_ped_id" 0 1
+CallNative "clear_ped_tasks_immediately" 1 0
+
+:Label_catch_load_cover
+push_1
+Call @menu_set_open_state
+push_0
+StaticSet1 11
+Call @menu_clean
+push_1
+StaticSet2 378
+PushString "SELECT"
+Call @menu_play_sound
+
+:Label_catch_load_4
+Call @modmanager_load_pressed
+
+:Label_catch_load_end
+Return 0 0
+
+:modmanager_load_pressed
+Function 0 3 0
+CallNative "is_pause_menu_active" 0 1
+Not
+JumpFalse @Label_load_pressed_3
+push_2
+Push1 182
+CallNative "is_control_pressed" 2 1
+JumpFalse @Label_load_pressed_3
+push_2
+Push1 183
+CallNative "is_control_pressed" 2 1
+JumpFalse @Label_load_pressed_3
+
+push_0
+Push1 22
+CallNative "disable_control_action" 2 0
+push_0
+Push1 42
+CallNative "disable_control_action" 2 0
+
+Call @menu_get_open_state
+JumpFalse @Label_load_pressed_4
+
+push_0
+StaticGet1 8
+JumpNE @Label_load_pressed_goto_3
+StaticGet1 19
+Add1 1
+StaticSet1 19
+Return 0 0
+
+:Label_load_pressed_goto_3
+Return 0 0
+Jump @Label_load_pressed_3
+
+:Label_load_pressed_4
+push_0
+StaticGet1 19
+JumpNE @Label_load_pressed_5
+StaticGet1 8
+Add1 1
+StaticSet1 8
+Return 0 0
+
+:Label_load_pressed_5
+Return 0 0
+
+:Label_load_pressed_3
+push_0
+StaticSet1 19
+push_0
+StaticSet1 8
+Return 0 0
+
+:menu_set
+Function 0 6 0
+
+push_1
+StaticSet1 11
+
+Call @modmanager_script_config
+
+Return 0 0
+
+:modmanager_script_config
+Function 0 3 0
+
+Call @menu_get_action_mode
+JumpFalse @Label_modmanager_script_config_set
+Call @menu_get_current_item
+Call @menu_get_count
+JumpNE @Label_modmanager_script_config_action_last_item
+Call @modmanager_add_custom_script
+Jump @Label_modmanager_script_config_goto_end
+
+:Label_modmanager_script_config_action_last_item
+Call @menu_get_current_number
+Call @modmanager_load_script_action
+
+:Label_modmanager_script_config_goto_end
+Jump @Label_modmanager_script_config_end
+
+:Label_modmanager_script_config_set
+PushString "ModManager"
+Call @menu_set_title
+
+pstatic2 501
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_1
+pstatic2 501
+pstatic2 501
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_1
+pstatic2 517
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_2
+pstatic2 517
+pstatic2 517
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_2
+pstatic2 533
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_3
+pstatic2 533
+pstatic2 533
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_3
+pstatic2 549
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_4
+pstatic2 549
+pstatic2 549
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_4
+pstatic2 565
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_5
+pstatic2 565
+pstatic2 565
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_5
+pstatic2 581
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_6
+pstatic2 581
+pstatic2 581
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_6
+pstatic2 597
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_7
+pstatic2 597
+pstatic2 597
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_7
+pstatic2 613
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_8
+pstatic2 613
+pstatic2 613
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_8
+pstatic2 629
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_9
+pstatic2 629
+pstatic2 629
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_9
+pstatic2 645
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_script_config_custom_10
+pstatic2 645
+pstatic2 645
+PushS 1024
+Call @modmanager_addItem_script
+
+:Label_modmanager_script_config_custom_10
+PushString "Add Custom Script"
+Call @menu_addItem_action
+
+:Label_modmanager_script_config_end
+Return 0 0
+
+:modmanager_addItem_script
+Function 3 6 0
+
+getF1 0
+Call @menu_addItem
+
+getF1 1
+Call @menu_add_number
+
+getF1 2
+Call @menu_add_data_2
+
+getF1 1
+setF1 5
+getF1 5
+CallNative "get_hash_key" 1 1
+CallNative "UNK_029D3841" 1 1
+push_0
+JumpEq @Label_modmanager_addItem_script_running
+push_1
+Call @menu_addItem_bool
+Jump @Label_modmanager_addItem_script_not_running
+
+:Label_modmanager_addItem_script_running
+push_0
+Call @menu_addItem_bool
+
+:Label_modmanager_addItem_script_not_running
+Call @menu_add_action
+
+:Label_modmanager_addItem_script_end
+Return 3 0
+
+:modmanager_addItem_script_menu
+Function 3 6 0
+
+getF1 0
+Call @menu_addItem
+
+getF1 1
+Call @menu_add_number
+
+getF1 2
+Call @menu_add_data_2
+
+push_1
+Call @menu_set_stored_data
+
+getF1 1
+setF1 5
+getF1 5
+CallNative "get_hash_key" 1 1
+CallNative "UNK_029D3841" 1 1
+push_0
+JumpEq @Label_modmanager_addItem_script_menu_running
+push_1
+Call @menu_addItem_bool
+Jump @Label_modmanager_addItem_script_menu_not_running
+
+:Label_modmanager_addItem_script_menu_running
+push_0
+Call @menu_addItem_bool
+
+:Label_modmanager_addItem_script_menu_not_running
+Call @menu_add_action
+
+:Label_modmanager_addItem_script_menu_end
+Return 3 0
+
+:modmanager_add_custom_script
+Function 0 7 0
+
+Push1 10
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_limit
+PushString "Limit Reached"
+push_0
+Call @menu_error
+Return 0 0
+
+:Label_modmanager_add_custom_script_limit
+PushString "HTX_ENTER"
+PushString ""
+Call @menu_keyboard_64
+JumpFalse @Label_modmanager_add_custom_script_end
+
+CallNative "get_onscreen_keyboard_result" 0 1
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_modmanager_add_custom_script_end
+
+StaticGet2 661
+Add1 1
+StaticSet2 661
+
+push_1
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_1
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 501
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_1
+push_2
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_2
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 517
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_2
+push_3
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_3
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 533
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_3
+push_4
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_4
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 549
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_4
+push_5
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_5
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 565
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_5
+push_6
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_6
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 581
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_6
+push_7
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_7
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 597
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_7
+Push1 8
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_8
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 613
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_8
+Push1 9
+StaticGet2 661
+JumpNE @Label_modmanager_add_custom_script_9
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 629
+StrCopy 64
+Jump @modmanager_add_custom_script_reset_menu
+
+:Label_modmanager_add_custom_script_9
+Push1 10
+StaticGet2 661
+JumpNE @modmanager_add_custom_script_reset_menu
+CallNative "get_onscreen_keyboard_result" 0 1
+pstatic2 645
+StrCopy 64
+
+:modmanager_add_custom_script_reset_menu
+Call @menu_clean
+Call @menu_set
+
+Call @menu_get_current_item
+Call @menu_get_current_level
+pstatic2 61
+ArraySet1 1
+
+Call @menu_set_last_selected
+
+:Label_modmanager_add_custom_script_end
+Return 0 0
+
+:menu_keyboard_64
+Function 2 36 0
+
+push_1
+Call @menu_set_continue_action
+
+Call @menu_get_sub_action_mode
+Switch [0=@Label_menu_keyboard_64_switch_0][1=@Label_menu_keyboard_64_switch_1]
+Jump @Label_menu_keyboard_64_end
+
+:Label_menu_keyboard_64_switch_0
+getF1 0
+setF1 4
+PushString ""
+setF1 5
+
+CallNative "is_xbox360_version" 0 1
+JumpFalse @Label_menu_keyboard_64_1
+getF1 4
+setF1 5
+
+:Label_menu_keyboard_64_1
+push_1
+Call @menu_set_sub_action_mode
+
+getF1 1
+CallNative "is_string_null_or_empty" 1 1
+Not
+JumpFalse @Label_menu_keyboard_64_3
+push_0
+getF1 4
+getF1 5
+getF1 1
+PushString ""
+PushString ""
+PushString ""
+Push1 63
+CallNative "display_onscreen_keyboard" 8 0
+Jump @Label_menu_keyboard_64_end
+
+:Label_menu_keyboard_64_3
+push_0
+getF1 4
+getF1 5
+PushString ""
+PushString ""
+PushString ""
+PushString ""
+Push1 63
+CallNative "display_onscreen_keyboard" 8 0
+Jump @Label_menu_keyboard_64_end
+
+:Label_menu_keyboard_64_switch_1
+CallNative "update_onscreen_keyboard" 0 1
+StaticSet1 28
+
+StaticGet1 28
+Switch [0=@Label_menu_keyboard_64_update_0][3=@Label_menu_keyboard_64_update_3][2=@Label_menu_keyboard_64_update_2][1=@Label_menu_keyboard_64_update_1]
+Jump @Label_menu_keyboard_64_goto_end
+
+:Label_menu_keyboard_64_update_0
+push_0
+Return 2 1
+
+:Label_menu_keyboard_64_update_3
+push_0
+Call @menu_set_continue_action
+push_0
+Call @menu_set_sub_action_mode
+push_0
+StaticSet1 28
+push_0
+Return 2 1
+
+:Label_menu_keyboard_64_update_2
+push_0
+Call @menu_set_continue_action
+push_0
+Call @menu_set_sub_action_mode
+push_0
+StaticSet1 28
+push_0
+Return 2 1
+
+:Label_menu_keyboard_64_update_1
+push_0
+Call @menu_set_continue_action
+push_0
+Call @menu_set_sub_action_mode
+push_0
+StaticSet1 28
+push_1
+Return 2 1
+
+:Label_menu_keyboard_64_goto_end
+Jump @Label_menu_keyboard_64_end
+
+:Label_menu_keyboard_64_end
+push_0
+Return 2 1
+
+:modmanager_load_script_action
+Function 1 4 0
+
+push_1
+Call @menu_set_continue_action
+
+Call @menu_get_sub_action_mode
+Switch [0=@Label_modmanager_load_script_action_0][1=@Label_modmanager_load_script_action_1][2=@Label_modmanager_load_script_action_2]
+Jump @Label_modmanager_load_script_action_end
+
+:Label_modmanager_load_script_action_0
+getF1 0
+CallNative "does_script_exist" 1 1
+Not
+JumpFalse @Label_modmanager_load_script_action_0_end
+PushString "Unable to load script:"
+getF1 0
+push_0
+Call @menu_error_2_strings
+push_0
+Call @menu_set_continue_action
+Return 1 0
+
+:Label_modmanager_load_script_action_0_end
+push_1
+Call @menu_set_sub_action_mode
+Return 1 0
+
+:Label_modmanager_load_script_action_1
+getF1 0
+CallNative "request_script" 1 0
+
+getF1 0
+CallNative "has_script_loaded" 1 1
+JumpFalse @Label_modmanager_load_script_action_1_end
+push_2
+Call @menu_set_sub_action_mode
+
+:Label_modmanager_load_script_action_1_end
+Return 1 0
+
+:Label_modmanager_load_script_action_2
+push_0
+getF1 0
+CallNative "get_hash_key" 1 1
+CallNative "UNK_029D3841" 1 1
+JumpNE @Label_modmanager_load_script_action_2_running
+
+push_0
+StaticGet2 500
+JumpNE @Label_modmanager_load_script_action_2_time
+getF1 0
+Call @modmanager_load_script
+
+:Label_modmanager_load_script_action_2_time
+getF1 0
+CallNative "get_hash_key" 1 1
+CallNative "UNK_029D3841" 1 1
+push_0
+JumpLE @Label_modmanager_load_script_action_2_1
+push_0
+Call @menu_set_continue_action
+push_0
+Call @menu_set_sub_action_mode
+push_0
+StaticSet2 500
+push_1
+Call @menu_set_current_bool
+Jump @Label_modmanager_load_script_action_2_goto_end
+
+:Label_modmanager_load_script_action_2_1
+StaticGet2 500
+PushS 2000
+Call @modmanager_time_passed
+JumpFalse @Label_modmanager_load_script_action_2_goto_end
+push_0
+Call @menu_set_continue_action
+push_0
+Call @menu_set_sub_action_mode
+push_0
+StaticSet2 500
+push_0
+Call @menu_set_current_bool
+PushString "Unable to start script."
+push_0
+Call @menu_error
+
+:Label_modmanager_load_script_action_2_goto_end
+Jump @Label_modmanager_load_script_action_2_end
+
+:Label_modmanager_load_script_action_2_running
+push_0
+Call @menu_set_continue_action
+push_0
+Call @menu_set_sub_action_mode
+push_0
+StaticSet2 500
+getF1 0
+CallNative "terminate_all_scripts_with_this_name" 1 0
+push_0
+Call @menu_set_current_bool
+
+:Label_modmanager_load_script_action_2_end
+Return 1 0
+
+:Label_modmanager_load_script_action_end
+Return 1 0
+
+:modmanager_time_passed
+Function 2 4 0
+CallNative "get_game_timer" 0 1
+getF1 0
+Sub
+getF1 1
+CmpGt
+Return 2 1
+
+:modmanager_load_script
+Function 1 5 0
+
+getF1 0
+CallNative "terminate_all_scripts_with_this_name" 1 0
+getF1 0
+Call @menu_get_current_data_2
+CallNative "start_new_script" 2 1
+drop
+CallNative "get_game_timer" 0 1
+StaticSet2 500
+getF1 0
+CallNative "set_script_as_no_longer_needed" 1 0
+
+Call @menu_get_current_item
+Call @menu_get_stored_data
+JumpFalse @Label_load_script_end
+
+Call @menu_shutdown
+
+:Label_load_script_end
+Return 1 0
+
+:menu_action
+Function 0 26 0
+
+push_1
+Call @menu_get_action_mode
+JumpNE @Label_action4
+
+Call @menu_set
+
+Call @menu_get_continue_action
+JumpFalse @Label_action4_continue
+push_1
+Call @menu_set_action_mode
+
+push_0
+Call @menu_set_continue_action
+Jump @Label_action4_goto_end
+
+:Label_action4_continue
+push_0
+Call @menu_set_action_mode
+
+:Label_action4_goto_end
+Jump @Label_action_end
+
+:Label_action4
+push_2
+Call @menu_get_action_mode
+JumpNE @Label_action2
+push_0
+Call @menu_set_action_mode
+Call @menu_shutdown
+Jump @Label_action_end
+
+:Label_action2
+push_3
+Call @menu_get_action_mode
+JumpNE @Label_action_end
+
+push_0
+Call @menu_set_action_mode
+
+:Label_action_end
+Return 0 0
+
+:modmanager_catch_button_press
+Function 0 7 0
+
+:Label_modmanager_catch_button_press_end
+Return 0 0
+
+:modmanager_setup
+Function 0 3 0
+
+push_0
+Call @menu_set_open_state
+
+PushString ""
+StaticSet2 430
+PushString "Enabled"
+StaticSet2 431
+
+Return 0 0
+
+:modmanager_close
+Function 0 3 0
+
+push_0
+Call @menu_set_open_state
+
+Return 0 0
+
+// !! Menu base START
+
+:menu_get_current_item
+Function 0 4 0
+
+StaticGet1 4
+Return 0 1
+
+:menu_get_count
+Function 0 4 0
+
+StaticGet1 5
+Return 0 1
+
+:menu_get_open_state
+Function 0 4 0
+
+CallNative "is_pause_menu_active" 0 1
+Not
+JumpFalse @Label_menu_get_open_state_1
+
+StaticGet1 6
+Return 0 1
+
+:Label_menu_get_open_state_1
+push_0
+Return 0 1
+
+:menu_set_open_state
+Function 1 4 0
+
+getF1 0
+StaticSet1 6
+Return 1 0
+
+:menu_get_action_mode
+Function 0 4 0
+
+StaticGet1 7
+Return 0 1
+
+:menu_set_action_mode
+Function 1 4 0
+
+getF1 0
+StaticSet1 7
+Return 1 0
+
+:menu_get_sub_action_mode
+Function 0 4 0
+
+StaticGet1 26
+Return 0 1
+
+:menu_set_sub_action_mode
+Function 1 4 0
+
+getF1 0
+StaticSet1 26
+Return 1 0
+
+:menu_get_continue_action
+Function 0 4 0
+
+StaticGet1 31
+Return 0 1
+
+:menu_set_continue_action
+Function 1 4 0
+
+getF1 0
+StaticSet1 31
+Return 1 0
+
+:menu_get_current_level
+Function 0 4 0
+
+StaticGet1 9
+Return 0 1
+
+:menu_get_last_selected
+Function 1 5 0
+
+getF1 0
+pstatic2 61
+ArrayGet1 1
+Return 1 1
+
+:menu_get_stored_data
+Function 1 5 0
+
+getF1 0
+pstatic2 379
+ArrayGet1 1
+Return 1 1
+
+:menu_set_stored_data
+Function 1 5 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_set_stored_data_end
+
+getF1 0
+Call @menu_get_count
+pstatic2 379
+ArraySet1 1
+
+:Label_menu_set_stored_data_end
+Return 1 0
+
+:menu_set_title
+Function 1 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_set_title_end
+getF1 0
+StaticSet1 10
+
+:Label_menu_set_title_end
+Return 1 0
+
+:menu_addItem
+Function 1 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_addItem_end
+
+Call @menu_get_count
+Add1 1
+StaticSet1 5
+
+getF1 0
+Call @menu_get_count
+pstatic1 72
+ArraySet1 1
+
+:Label_menu_addItem_end
+Return 1 0
+
+:menu_add_number
+Function 1 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_add_number_end
+
+getF1 0
+Call @menu_get_count
+pstatic2 276
+ArraySet1 1
+
+:Label_menu_add_number_end
+Return 1 0
+
+:menu_get_current_number
+Function 0 4 0
+
+Call @menu_get_current_item
+pstatic2 276
+ArrayGet1 1
+Return 0 1
+
+:menu_add_data_2
+Function 1 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_add_data_2_end
+
+getF1 0
+Call @menu_get_count
+pstatic2 327
+ArraySet1 1
+
+:Label_menu_add_data_2_end
+Return 1 0
+
+:menu_get_current_data_2
+Function 0 4 0
+
+Call @menu_get_current_item
+pstatic2 327
+ArrayGet1 1
+Return 0 1
+
+:menu_addItem_bool
+Function 1 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_addItem_bool_end
+
+push_3
+Call @menu_get_count
+pstatic1 123
+ArraySet1 1
+
+getF1 0
+Call @menu_get_count
+pstatic1 174
+ArraySet1 1
+
+:Label_menu_addItem_bool_end
+Return 1 0
+
+:menu_set_current_bool
+Function 1 4 0
+
+getF1 0
+Call @menu_get_current_item
+pstatic1 174
+ArraySet1 1
+Return 1 0
+
+:menu_addItem_action
+Function 1 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_addItem_action_end
+
+Call @menu_get_count
+Add1 1
+StaticSet1 5
+
+getF1 0
+Call @menu_get_count
+pstatic1 72
+ArraySet1 1
+
+push_1
+Call @menu_get_count
+pstatic2 225
+ArraySet1 1
+
+:Label_menu_addItem_action_end
+Return 1 0
+
+:menu_add_action
+Function 0 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_add_action_end
+
+push_1
+Call @menu_get_count
+pstatic2 225
+ArraySet1 1
+
+:Label_menu_add_action_end
+Return 0 0
+
+:menu_addItem_frontend
+Function 2 4 0
+
+Call @menu_get_action_mode
+Not
+JumpFalse @Label_menu_addItem_frontend
+
+StaticGet1 46
+Add1 1
+StaticSet1 46
+
+getF1 0
+StaticGet1 46
+pstatic1 47
+ArraySet1 1
+
+getF1 1
+StaticGet1 46
+pstatic1 54
+ArraySet1 1
+
+:Label_menu_addItem_frontend
+Return 2 0
+
+:menu_draw_frontend_hook
+Function 0 4 0
+
+StaticGet1 46
+setF1 3
+
+push_6
+Call @menu_get_current_item
+pstatic1 123
+ArrayGet1 1
+CmpEq
+dup
+Not
+JumpFalse @Label_menu_draw_frontend_hook_or_1
+push_7
+Call @menu_get_current_item
+pstatic1 123
+ArrayGet1 1
+CmpEq
+Or
+
+:Label_menu_draw_frontend_hook_or_1
+dup
+Not
+JumpFalse @Label_menu_draw_frontend_hook_or_2
+Push1 12
+Call @menu_get_current_item
+pstatic1 123
+ArrayGet1 1
+CmpEq
+Or
+
+:Label_menu_draw_frontend_hook_or_2
+dup
+Not
+JumpFalse @Label_menu_draw_frontend_hook_or_3
+Push1 14
+Call @menu_get_current_item
+pstatic1 123
+ArrayGet1 1
+CmpEq
+Or
+
+:Label_menu_draw_frontend_hook_or_3
+JumpFalse @Label_menu_draw_frontend_hook_end
+
+getF1 3
+Add1 1
+setF1 3
+
+getF1 3
+Push1 32
+PushString "Edit With Keyboard"
+Call @menu_add_frontend
+
+push_2
+Call @menu_get_current_item
+pstatic1 123
+ArrayGet1 1
+CmpEq
+dup
+Not
+JumpFalse @Label_menu_draw_frontend_hook_or_4
+Push1 12
+Call @menu_get_current_item
+pstatic1 123
+ArrayGet1 1
+CmpEq
+Or
+
+:Label_menu_draw_frontend_hook_or_4
+JumpFalse @Label_menu_draw_frontend_hook_end
+
+getF1 3
+Add1 1
+setF1 3
+
+getF1 3
+Push1 36
+PushString "Increment Faster (Hold)"
+Call @menu_add_frontend
+
+getF1 3
+Add1 1
+setF1 3
+
+getF1 3
+Push1 34
+PushString "Increment Slower (Hold)"
+Call @menu_add_frontend
+
+:Label_menu_draw_frontend_hook_end
+Return 0 0
+
+:menu_add_frontend
+Function 3 5 0
+
+StaticGet1 12
+PushString "SET_DATA_SLOT"
+CallNative "UNK_215ABBE8" 2 1
+drop
+getF1 0
+CallNative "UNK_716777CB" 1 0
+getF1 1
+CallNative "UNK_716777CB" 1 0
+
+getF1 2
+CallNative "does_text_label_exist" 1 1
+JumpFalse @Label_menu_add_frontend_string
+
+getF1 2
+CallNative "clear_player_has_2_characters_enable" 1 0
+Jump @Label_menu_add_frontend_gxt
+
+:Label_menu_add_frontend_string
+PushString "STRING"
+CallNative "clear_player_has_2_characters_enable" 1 0
+getF1 2
+CallNative "UNK_27A244D8" 1 0
+
+:Label_menu_add_frontend_gxt
+push_-1
+CallNative "add_text_component_integer" 1 0
+CallNative "UNK_386CE0B8" 0 0
+CallNative "UNK_02DBF2D7" 0 0
+
+Return 3 0
+
+:menu_setup
+Function 0 2 0
+
+push_0
+StaticGet2 434
+JumpNE @Label_position_setup_right
+fPush 0.0546875
+StaticSet1 3
+Jump @Label_position_setup_end
+:Label_position_setup_right
+fPush 0.7546875
+StaticSet1 3
+:Label_position_setup_end
+
+push_0
+StaticSet1 4
+push_-1
+StaticSet1 5
+push_0
+Call @menu_set_action_mode
+push_0
+StaticSet1 8
+
+push_0
+StaticSet1 9
+
+PushString ""
+Call @menu_set_title
+
+push_0
+StaticSet1 11
+
+push_2
+StaticSet1 15
+
+push_1
+StaticSet1 17
+
+fPush 0.0527
+StaticSet1 20
+
+StaticGet1 20
+StaticSet1 21
+
+fPush 0.03472
+StaticSet1 22
+
+Push1 14
+StaticSet1 23
+
+StaticGet1 23
+StaticSet1 24
+
+push_7
+StaticSet1 25
+
+push_0
+StaticSet1 45
+
+push_-1
+StaticSet1 46
+
+PushString "PIM_DHIGH0"
+StaticSet2 430
+PushString "PIM_DHIGH1"
+StaticSet2 431
+
+push_4
+StaticSet2 432
+
+push_0
+StaticSet2 433
+
+push_1
+StaticSet2 435
+
+Return 0 0
+
+:menu_modify_game_state
+Function 0 2 0
+
+pglobal2 13242
+GetImmediate2 6183
+Not
+JumpFalse @Label_menu_modify_game_state_1
+Call @menu_modify_game_state_globals
+
+:Label_menu_modify_game_state_1
+CallNative "get_game_timer" 0 1
+pglobal2 13242
+SetImmediate2 4621
+
+CallNative "hide_help_text_this_frame" 0 0
+push_0
+CallNative "set_cinematic_button_active" 1 0
+
+CallNative "player_ped_id" 0 1
+push_1
+push_-1
+push_0
+CallNative "set_ped_using_action_mode" 4 0
+
+push_0
+push_0
+CallNative "disable_control_action" 2 0
+
+push_0
+Push1 90
+CallNative "disable_control_action" 2 0
+push_0
+Push1 73
+CallNative "disable_control_action" 2 0
+push_2
+Push1 176
+CallNative "set_input_exclusive" 2 0
+push_2
+Push1 174
+CallNative "set_input_exclusive" 2 0
+push_2
+Push1 175
+CallNative "set_input_exclusive" 2 0
+
+push_0
+Push1 46
+CallNative "disable_control_action" 2 0
+push_2
+Push1 161
+CallNative "set_input_exclusive" 2 0
+push_2
+Push1 162
+CallNative "set_input_exclusive" 2 0
+
+push_2
+Push1 174
+CallNative "disable_control_action" 2 0
+push_2
+Push1 175
+CallNative "disable_control_action" 2 0
+push_2
+Push1 163
+CallNative "disable_control_action" 2 0
+push_2
+Push1 164
+CallNative "disable_control_action" 2 0
+push_2
+Push1 161
+CallNative "disable_control_action" 2 0
+push_2
+Push1 162
+CallNative "disable_control_action" 2 0
+
+Push1 10
+CallNative "hide_hud_component_this_frame" 1 0
+push_6
+CallNative "hide_hud_component_this_frame" 1 0
+push_7
+CallNative "hide_hud_component_this_frame" 1 0
+Push1 9
+CallNative "hide_hud_component_this_frame" 1 0
+Push1 8
+CallNative "hide_hud_component_this_frame" 1 0
+
+push_2
+Push1 163
+CallNative "set_input_exclusive" 2 0
+push_2
+Push1 164
+CallNative "set_input_exclusive" 2 0
+
+push_0
+Push1 20
+CallNative "disable_control_action" 2 0
+push_0
+Push1 59
+CallNative "disable_control_action" 2 0
+
+push_0
+Push1 85
+CallNative "disable_control_action" 2 0
+push_0
+Push1 86
+CallNative "disable_control_action" 2 0
+push_0
+Push1 87
+CallNative "disable_control_action" 2 0
+push_0
+Push1 88
+CallNative "disable_control_action" 2 0
+push_0
+Push1 89
+CallNative "disable_control_action" 2 0
+
+push_0
+Push1 37
+CallNative "disable_control_action" 2 0
+push_0
+Push1 136
+CallNative "disable_control_action" 2 0
+push_0
+Push1 137
+CallNative "disable_control_action" 2 0
+push_0
+Push1 138
+CallNative "disable_control_action" 2 0
+push_0
+Push1 139
+CallNative "disable_control_action" 2 0
+push_0
+Push1 140
+CallNative "disable_control_action" 2 0
+push_0
+Push1 141
+CallNative "disable_control_action" 2 0
+push_0
+Push1 142
+CallNative "disable_control_action" 2 0
+push_0
+Push1 143
+CallNative "disable_control_action" 2 0
+push_0
+Push1 144
+CallNative "disable_control_action" 2 0
+push_0
+Push1 14
+CallNative "disable_control_action" 2 0
+push_0
+Push1 15
+CallNative "disable_control_action" 2 0
+push_0
+Push1 50
+CallNative "disable_control_action" 2 0
+push_0
+Push1 51
+CallNative "disable_control_action" 2 0
+push_0
+Push1 120
+CallNative "disable_control_action" 2 0
+push_0
+Push1 121
+CallNative "disable_control_action" 2 0
+push_0
+Push1 123
+CallNative "disable_control_action" 2 0
+push_0
+Push1 45
+CallNative "disable_control_action" 2 0
+push_0
+Push1 67
+CallNative "disable_control_action" 2 0
+push_0
+Push1 76
+CallNative "disable_control_action" 2 0
+push_0
+Push1 42
+CallNative "disable_control_action" 2 0
+push_0
+Push1 43
+CallNative "disable_control_action" 2 0
+push_0
+Push1 52
+CallNative "disable_control_action" 2 0
+push_0
+Push1 73
+CallNative "disable_control_action" 2 0
+
+push_0
+Push1 22
+CallNative "disable_control_action" 2 0
+push_0
+Push1 90
+CallNative "disable_control_action" 2 0
+push_0
+Push1 103
+CallNative "disable_control_action" 2 0
+
+push_0
+Push1 146
+CallNative "disable_control_action" 2 0
+push_0
+Push1 145
+CallNative "disable_control_action" 2 0
+push_0
+Push1 147
+CallNative "disable_control_action" 2 0
+push_0
+Push1 148
+CallNative "disable_control_action" 2 0
+push_0
+Push1 19
+CallNative "disable_control_action" 2 0
+
+:menu_modify_game_state_end
+Return 0 0
+
+:menu_modify_game_state_globals
+Function 0 2 0
+pglobal2 10433
+GetImmediate1 1
+push_1
+CmpEq
+Not
+JumpFalse @menu_modify_game_state_globals_end
+push_0
+Call @menu_get_mobile_globals
+JumpFalse @menu_modify_game_state_globals_1
+push_0
+Call @Label_menu_set_mobile_globals_297
+
+:menu_modify_game_state_globals_1
+pglobal2 1687
+push_2
+CallNative "set_bit" 2 0
+
+:menu_modify_game_state_globals_end
+Return 0 0
+
+:Label_menu_set_mobile_globals_297
+Function 1 3 0
+globalget2 10588
+JumpFalse @Label_menu_set_mobile_globals_298
+push_0
+push_0
+Call @menu_set_mobile_position_299
+
+:Label_menu_set_mobile_globals_298
+pglobal2 10433
+GetImmediate1 1
+Push1 10
+CmpEq
+dup
+Not
+JumpFalse @Label_menu_set_mobile_globals_300
+pglobal2 10433
+GetImmediate1 1
+Push1 9
+CmpEq
+Or
+
+:Label_menu_set_mobile_globals_300
+JumpFalse @Label_menu_set_mobile_globals_301
+pglobal2 1687
+Push1 16
+CallNative "set_bit" 2 0
+
+:Label_menu_set_mobile_globals_301
+CallNative "is_mobile_phone_call_ongoing" 0 1
+JumpFalse @Label_menu_set_mobile_globals_302
+push_0
+CallNative "stop_scripted_conversation" 1 1
+drop
+
+:Label_menu_set_mobile_globals_302
+push_5
+globalset2 11728
+getF1 0
+push_1
+JumpNE @Label_menu_set_mobile_globals_303
+pglobal2 1686
+Push1 30
+CallNative "set_bit" 2 0
+Jump @Label_menu_set_mobile_globals_304
+
+:Label_menu_set_mobile_globals_303
+pglobal2 1686
+Push1 30
+CallNative "clear_bit" 2 0
+
+:Label_menu_set_mobile_globals_304
+Call @menu_set_mobile_globals_2_305
+Not
+JumpFalse @Label_menu_set_mobile_globals_306
+push_3
+pglobal2 10433
+SetImmediate1 1
+
+:Label_menu_set_mobile_globals_306
+Return 1 0
+
+:menu_set_mobile_globals_2_305
+Function 0 2 0
+pglobal2 10433
+GetImmediate1 1
+push_1
+CmpEq
+dup
+Not
+JumpFalse @Label_menu_set_mobile_globals_2_307
+pglobal2 10433
+GetImmediate1 1
+push_0
+CmpEq
+Or
+
+:Label_menu_set_mobile_globals_2_307
+JumpFalse @Label_menu_set_mobile_globals_2_308
+push_1
+Return 0 1
+
+:Label_menu_set_mobile_globals_2_308
+push_0
+Return 0 1
+
+:menu_set_mobile_position_299
+Function 2 4 0
+getF1 0
+JumpFalse @Label_menu_set_mobile_position_309
+push_0
+Call @menu_get_mobile_globals
+JumpFalse @Label_menu_set_mobile_position_310
+push_1
+globalset2 10588
+getF1 1
+JumpFalse @Label_menu_set_mobile_position_311
+pglobal2 10370
+CallNative "get_mobile_phone_position" 1 0
+
+:Label_menu_set_mobile_position_311
+push_3
+globalget2 10378
+pglobal2 10379
+ArrayGetP1 3
+ToStack
+push_3
+pglobal2 10361
+FromStack
+push_3
+pglobal2 10361
+ToStack
+CallNative "set_mobile_phone_position" 3 0
+
+:Label_menu_set_mobile_position_310
+Jump @Label_menu_set_mobile_position_312
+
+:Label_menu_set_mobile_position_309
+globalget2 10588
+push_1
+JumpNE @Label_menu_set_mobile_position_312
+push_0
+globalset2 10588
+push_3
+globalget2 10378
+pglobal2 10386
+ArrayGetP1 3
+ToStack
+push_3
+pglobal2 10361
+FromStack
+getF1 1
+JumpFalse @Label_menu_set_mobile_position_313
+push_3
+pglobal2 10370
+ToStack
+CallNative "set_mobile_phone_position" 3 0
+Jump @Label_menu_set_mobile_position_312
+
+:Label_menu_set_mobile_position_313
+push_3
+pglobal2 10361
+ToStack
+CallNative "set_mobile_phone_position" 3 0
+
+:Label_menu_set_mobile_position_312
+Return 2 0
+
+:menu_get_mobile_globals
+Function 1 3 0
+getF1 0
+push_1
+JumpNE @Label_menu_get_mobile_globals_314
+pglobal2 10433
+GetImmediate1 1
+push_3
+JumpLE @Label_menu_get_mobile_globals_315
+globalget2 1686
+Push1 14
+CallNative "is_bit_set" 2 1
+JumpFalse @Label_menu_get_mobile_globals_316
+push_1
+Return 1 1
+
+:Label_menu_get_mobile_globals_316
+push_0
+Return 1 1
+
+:Label_menu_get_mobile_globals_315
+push_0
+Return 1 1
+
+:Label_menu_get_mobile_globals_314
+Push -754107665
+CallNative "UNK_029D3841" 1 1
+push_0
+JumpLE @Label_menu_get_mobile_globals_319
+push_1
+Return 1 1
+
+:Label_menu_get_mobile_globals_319
+pglobal2 10433
+GetImmediate1 1
+push_3
+JumpLE @Label_menu_get_mobile_globals_320
+push_1
+Return 1 1
+
+:Label_menu_get_mobile_globals_320
+push_0
+Return 1 1
+
+:menu_reverse_game_state
+Function 0 2 0
+CallNative "player_ped_id" 0 1
+push_0
+push_-1
+push_0
+CallNative "set_ped_using_action_mode" 4 0
+
+push_1
+CallNative "set_cinematic_button_active" 1 0
+Return 0 0
+
+:menu_shutdown
+Function 0 2 0
+Call @menu_reverse_game_state
+push_0
+StaticSet1 13
+pstatic1 12
+CallNative "set_scaleform_movie_as_no_longer_needed" 1 0
+push_0
+StaticSet1 27
+PushString "CommonMenu"
+CallNative "set_streamed_texture_dict_as_no_longer_needed" 1 0
+Call @modmanager_close
+
+:menu_shutdown_end
+Return 0 0
+
+:menu_catch_button_press
+Function 0 9 0
+
+Call @menu_get_count
+setF1 3
+
+getF1 3
+StaticGet1 25
+Sub
+setF1 6
+
+push_1
+Call @menu_down_pressed
+JumpFalse @Label_catch_up_button_press
+PushString "NAV_UP_DOWN"
+Call @menu_play_sound
+Call @menu_get_current_item
+getF1 3
+JumpGE @Label_catch_button_press_1
+Call @menu_get_current_item
+Add1 1
+StaticSet1 4
+
+getF1 3
+StaticGet1 24
+JumpLE @Label_catch_down_button_press_end
+
+Call @menu_get_current_item
+getF1 6
+Add1 1
+JumpGE @Label_catch_down_button_press_end
+
+Call @menu_get_current_item
+StaticGet1 25
+JumpLE @Label_catch_down_button_press_end
+StaticGet1 20
+StaticGet1 22
+fSub
+StaticSet1 20
+
+StaticGet1 23
+Add1 1
+StaticSet1 23
+
+:Label_catch_down_button_press_end
+Jump @Label_catch_button_press_2
+
+:Label_catch_button_press_1
+StaticGet1 21
+StaticSet1 20
+StaticGet1 24
+StaticSet1 23
+push_0
+StaticSet1 4
+
+:Label_catch_button_press_2
+Jump @Label_catch_button_press_end
+
+:Label_catch_up_button_press
+push_1
+Call @menu_up_pressed
+JumpFalse @Label_catch_button_press_end
+PushString "NAV_UP_DOWN"
+Call @menu_play_sound
+Call @menu_get_current_item
+push_0
+JumpLE @Label_catch_button_press_4
+Call @menu_get_current_item
+push_1
+Sub
+StaticSet1 4
+
+getF1 3
+StaticGet1 24
+JumpLE @Label_catch_up_button_press_end
+
+Call @menu_get_current_item
+getF1 6
+JumpGE @Label_catch_up_button_press_end
+
+Call @menu_get_current_item
+StaticGet1 25
+push_1
+Sub
+JumpLE @Label_catch_up_button_press_end
+StaticGet1 20
+StaticGet1 22
+fAdd
+StaticSet1 20
+
+StaticGet1 23
+push_1
+Sub
+StaticSet1 23
+
+:Label_catch_up_button_press_end
+Jump @Label_catch_button_press_end
+
+:Label_catch_button_press_4
+Call @menu_get_count
+StaticGet1 24
+JumpLE @Label_catch_button_press_3_1
+
+StaticGet1 25
+setF1 7
+
+:Label_catch_button_press_loop
+getF1 7
+Call @menu_get_count
+JumpGT @Label_catch_button_press_end
+
+getF1 7
+getF1 6
+JumpGE @Label_catch_button_press_loop_exit
+
+StaticGet1 20
+StaticGet1 22
+fSub
+StaticSet1 20
+
+StaticGet1 23
+Add1 1
+StaticSet1 23
+
+getF1 7
+Add1 1
+setF1 7
+Jump @Label_catch_button_press_loop
+
+:Label_catch_button_press_loop_exit
+getF1 3
+StaticSet1 4
+Jump @Label_catch_button_press_end
+
+:Label_catch_button_press_3_1
+getF1 3
+StaticSet1 4
+
+:Label_catch_button_press_end
+StaticGet1 14
+JumpFalse @Label_catch_button_press_end2
+push_2
+StaticSet1 15
+push_0
+StaticSet1 14
+
+:Label_catch_button_press_end2
+Return 0 0
+
+:menu_set_last_selected
+Function 0 5 0
+
+Call @menu_get_current_level
+Call @menu_get_last_selected
+Call @menu_get_count
+JumpGT @Label_menu_set_last_selected_4
+Call @menu_get_current_level
+Call @menu_get_last_selected
+StaticSet1 4
+Jump @Label_menu_set_last_selected_5
+
+:Label_menu_set_last_selected_4
+Call @menu_get_count
+StaticSet1 4
+
+:Label_menu_set_last_selected_5
+push_0
+Call @menu_get_current_level
+pstatic2 61
+ArraySet1 1
+
+Call @menu_get_count
+StaticGet1 24
+JumpLE @Label_menu_set_last_selected_end
+Call @menu_get_current_item
+StaticGet1 25
+JumpLE @Label_menu_set_last_selected_end
+StaticGet1 25
+Add1 1
+setF1 3
+
+Call @menu_get_count
+StaticGet1 25
+Sub
+setF1 4
+
+:Label_menu_set_last_selected_loop
+getF1 3
+Call @menu_get_current_item
+JumpGT @Label_menu_set_last_selected_end
+
+getF1 3
+getF1 4
+Add1 1
+JumpGE @Label_menu_set_last_selected_end
+
+StaticGet1 20
+StaticGet1 22
+fSub
+StaticSet1 20
+
+StaticGet1 23
+Add1 1
+StaticSet1 23
+
+getF1 3
+Add1 1
+setF1 3
+Jump @Label_menu_set_last_selected_loop
+
+:Label_menu_set_last_selected_end
+Return 0 0
+
+:menu_catch_select_button_press
+Function 0 4 0
+push_2
+Push1 174
+CallNative "is_disabled_control_just_pressed" 2 1
+JumpFalse @Label_741
+StaticGet1 17
+push_2
+JumpGE @Label_catch_select_button_press_goto_end
+PushString "SELECT"
+Call @menu_play_sound
+
+push_1
+Call @menu_get_current_item
+pstatic2 225
+ArrayGet1 1
+JumpEq @Label_catch_select_button_press_2
+
+push_0
+StaticSet1 11
+
+Call @menu_get_current_item
+Call @menu_get_current_level
+pstatic2 61
+ArraySet1 1
+
+push_0
+StaticSet1 4
+
+Call @menu_clean
+
+Call @menu_get_current_level
+Add1 1
+StaticSet1 9
+Jump @Label_catch_select_button_press_goto_end
+
+:Label_catch_select_button_press_2
+push_1
+Call @menu_set_action_mode
+
+:Label_catch_select_button_press_goto_end
+Jump @Label_catch_select_button_press_end
+
+:Label_741
+push_2
+Push1 175
+CallNative "is_disabled_control_just_released" 2 1
+JumpFalse @Label_catch_select_button_press_square
+
+push_0
+Call @menu_get_current_level
+JumpEq @Label_catch_select_button_press_3
+
+PushString "BACK"
+Call @menu_play_sound
+
+push_0
+StaticSet1 11
+
+Call @menu_get_current_level
+push_1
+Sub
+StaticSet1 9
+Call @menu_clean
+Jump @Label_catch_select_button_press_goto_end2
+
+:Label_catch_select_button_press_3
+PushString "CANCEL"
+Call @menu_play_sound
+
+push_2
+Call @menu_set_action_mode
+
+:Label_catch_select_button_press_goto_end2
+Jump @Label_catch_select_button_press_end
+
+:Label_catch_select_button_press_square
+push_2
+Push1 176
+CallNative "is_disabled_control_just_pressed" 2 1
+JumpFalse @Label_catch_select_button_press_end
+
+push_3
+Call @menu_set_action_mode
+
+:Label_catch_select_button_press_end
+Return 0 0
+
+:menu_play_sound
+Function 1 3 0
+
+StaticGet2 435
+JumpFalse @Label_menu_play_sound_end
+
+push_-1
+getF1 0
+PushString "HUD_FRONTEND_DEFAULT_SOUNDSET"
+CallNative "play_sound_frontend" 3 0
+
+:Label_menu_play_sound_end
+Return 1 0
+
+:menu_error
+Function 2 5 0
+
+getF1 1
+push_1
+JumpLT @Label_menu_error_1
+getF1 1
+Call @menu_error_back
+
+:Label_menu_error_1
+PushString "STRING"
+CallNative "UNK_574EE85C" 1 0
+getF1 0
+CallNative "UNK_27A244D8" 1 0
+push_0
+push_1
+CallNative "UNK_08F7AF78" 2 1
+drop
+
+Return 2 0
+
+:menu_error_2_strings
+Function 3 6 0
+
+getF1 2
+push_1
+JumpLT @Label_menu_error_2_strings_1
+getF1 2
+Call @menu_error_back
+
+:Label_menu_error_2_strings_1
+PushString "TWOSTRINGS"
+CallNative "UNK_574EE85C" 1 0
+getF1 0
+CallNative "UNK_27A244D8" 1 0
+getF1 1
+CallNative "UNK_27A244D8" 1 0
+push_0
+push_1
+CallNative "UNK_08F7AF78" 2 1
+drop
+
+Return 3 0
+
+:menu_error_back
+Function 1 4 0
+
+push_0
+StaticSet1 11
+push_0
+StaticSet1 45
+
+Call @menu_clean
+
+Call @menu_get_current_level
+getF1 0
+Sub
+StaticSet1 9
+
+Call @menu_get_current_level
+Call @menu_get_last_selected
+StaticSet1 4
+
+Call @menu_set
+Call @menu_set_frontend
+
+Return 1 0
+
+:menu_frontend_clean
+Function 0 3 0
+
+push_0
+StaticSet1 45
+
+push_-1
+StaticSet1 46
+
+Return 0 0
+
+:menu_clean
+Function 0 5 0
+
+push_0
+setF1 3
+
+Call @menu_get_count
+Add1 1
+setF1 4
+
+:Label_menu_clean_LOOP
+getF1 3
+getF1 4
+JumpGE @Label_menu_clean_END
+PushString ""
+getF1 3
+pstatic1 72
+ArraySet1 1
+
+push_0
+getF1 3
+pstatic1 123
+ArraySet1 1
+
+push_0
+getF1 3
+pstatic1 174
+ArraySet1 1
+
+push_0
+getF1 3
+pstatic2 225
+ArraySet1 1
+
+push_0
+getF1 3
+pstatic2 276
+ArraySet1 1
+
+push_0
+getF1 3
+pstatic2 327
+ArraySet1 1
+
+
+getF1 3
+Add1 1
+setF1 3
+Jump @Label_menu_clean_LOOP
+
+:Label_menu_clean_END
+StaticGet1 21
+StaticSet1 20
+StaticGet1 24
+StaticSet1 23
+push_-1
+StaticSet1 5
+push_0
+Call @menu_set_action_mode
+push_0
+Call @menu_set_sub_action_mode
+
+push_0
+StaticSet1 28
+
+push_0
+StaticSet1 29
+
+push_0
+StaticSet1 30
+
+Call @menu_frontend_clean
+
+Return 0 0
+
+:menu_draw_window
+Function 0 9 0
+
+Push2 76 84
+CallNative "UNK_228A2598" 2 0
+fPush -0.05
+fPush -0.05
+fPush_0.0
+fPush_0.0
+CallNative "UNK_76C641E4" 4 0
+
+Push1 140
+pFrame1 2
+pFrame1 3
+pFrame1 4
+pFrame1 5
+CallNative "get_hud_colour" 5 0
+
+Call @menu_get_count
+StaticGet1 24
+JumpLE @Label_menu_draw_window_1
+StaticGet1 24
+Add1 1
+setF1 6
+Jump @Label_menu_draw_window_2
+
+:Label_menu_draw_window_1
+Call @menu_get_count
+Add1 1
+setF1 6
+
+:Label_menu_draw_window_2
+StaticGet1 22
+getF1 6
+ItoF
+fMul
+setF1 7
+StaticGet1 3
+fPush 0.0046875
+fSub
+fPush 0.084722
+fPush 0.225
+getF1 7
+getF1 2
+getF1 3
+getF1 4
+getF1 5
+Call @draw_rect
+StaticGet1 3
+fPush 0.0046875
+fSub
+fPush 0.04999922
+fPush 0.225
+StaticGet1 22
+push_0
+push_0
+push_0
+Push1 204
+Call @draw_rect
+
+Call @menu_get_count
+StaticGet1 24
+JumpLE @Label_menu_draw_window_end
+
+StaticGet1 3
+fPush 0.0046875
+fSub
+getF1 7
+StaticGet1 22
+fAdd
+fPush 0.04999922
+fAdd
+fPush 0.225
+StaticGet1 22
+push_0
+push_0
+push_0
+Push1 204
+Call @draw_rect
+
+:Label_menu_draw_window_end
+Return 0 0
+
+:draw_rect
+Function 8 10 0
+getF1 0
+getF1 2
+fPush 0.5
+fMul
+fAdd
+getF1 1
+getF1 3
+fPush 0.5
+fMul
+fAdd
+getF1 2
+getF1 3
+getF1 4
+getF1 5
+getF1 6
+getF1 7
+CallNative "draw_rect" 8 0
+Return 8 0
+
+:menu_do_hold_pressed
+Function 1 4 0
+push_2
+getF1 0
+CallNative "is_disabled_control_pressed" 2 1
+JumpFalse @Label_menu_do_hold_pressed_2
+getF1 0
+StaticSet1 18
+
+StaticGet1 16
+Push1 8
+JumpLE @Label_menu_do_hold_pressed_1
+StaticGet1 17
+Add1 1
+StaticSet1 17
+push_0
+StaticSet1 16
+
+:Label_menu_do_hold_pressed_1
+StaticGet1 16
+Add1 1
+StaticSet1 16
+StaticGet1 15
+Add1 1
+StaticSet1 15
+
+StaticGet1 15
+StaticGet1 17
+Mult
+StaticSet1 15
+
+
+Jump @Label_menu_do_hold_pressed_end
+
+:Label_menu_do_hold_pressed_2
+getF1 0
+StaticGet1 18
+JumpNE @Label_menu_do_hold_pressed_end
+push_1
+StaticSet1 17
+push_0
+StaticSet1 16
+
+:Label_menu_do_hold_pressed_end
+Return 1 0
+
+:menu_is_hold_pressed
+Function 1 4 0
+StaticGet1 15
+push_5
+JumpLE @Label_menu_is_hold_pressed_false
+push_2
+getF1 0
+CallNative "is_disabled_control_pressed" 2 1
+JumpFalse @Label_menu_is_hold_pressed_false
+push_1
+Return 1 1
+
+:Label_menu_is_hold_pressed_false
+push_0
+Return 1 1
+
+:menu_up_pressed
+Function 1 4 0
+
+push_2
+Push1 162
+CallNative "is_disabled_control_just_pressed" 2 1
+dup
+Not
+JumpFalse @Label_menu_up_pressed_or
+Push1 162
+Call @menu_is_hold_pressed
+Or
+
+:Label_menu_up_pressed_or
+JumpFalse @Label_menu_up_pressed_hold
+push_1
+StaticSet1 14
+push_1
+Return 1 1
+
+:Label_menu_up_pressed_hold
+getF1 0
+JumpFalse @Label_menu_up_pressed_end
+Push1 162
+Call @menu_do_hold_pressed
+
+:Label_menu_up_pressed_end
+push_0
+Return 1 1
+
+:menu_down_pressed
+Function 1 4 0
+push_2
+Push1 161
+CallNative "is_disabled_control_just_pressed" 2 1
+dup
+Not
+JumpFalse @Label_menu_down_pressed_or
+Push1 161
+Call @menu_is_hold_pressed
+Or
+
+:Label_menu_down_pressed_or
+JumpFalse @Label_menu_down_pressed_hold
+push_1
+StaticSet1 14
+push_1
+Return 1 1
+
+:Label_menu_down_pressed_hold
+getF1 0
+JumpFalse @Label_menu_down_pressed_end
+Push1 161
+Call @menu_do_hold_pressed
+
+:Label_menu_down_pressed_end
+push_0
+Return 1 1
+
+:menu_load_sprite
+Function 0 3 0
+
+StaticGet1 27
+Not
+JumpFalse @Label_menu_draw_sprite_end
+
+PushString "CommonMenu"
+push_0
+CallNative "request_streamed_texture_dict" 2 0
+
+PushString "CommonMenu"
+CallNative "has_streamed_texture_dict_loaded" 1 1
+JumpFalse @Label_menu_draw_sprite_end
+push_1
+StaticSet1 27
+
+:Label_menu_draw_sprite_end
+Return 0 0
+
+:menu_set_frontend
+Function 0 5 0
+
+StaticGet1 45
+Not
+JumpFalse @Label_menu_set_frontend_end
+
+push_1
+StaticSet1 45
+
+Push1 30
+PushString "ITEM_SELECT"
+Call @menu_addItem_frontend
+
+push_0
+Call @menu_get_current_level
+JumpEq @Label_menu_set_frontend_exit
+
+Push1 31
+PushString "ITEM_BACK"
+Call @menu_addItem_frontend
+Jump @Label_menu_set_frontend_end
+
+:Label_menu_set_frontend_exit
+Push1 31
+PushString "ITEM_EXIT"
+Call @menu_addItem_frontend
+
+:Label_menu_set_frontend_end
+Return 0 0
+
+:menu_draw_frontend
+Function 0 5 0
+
+StaticGet1 12
+CallNative "has_scaleform_movie_loaded" 1 1
+JumpFalse @Label_draw_frontend_not_loaded
+StaticGet1 13
+JumpFalse @Label_draw_frontend_loaded
+
+StaticGet1 12
+PushString "CLEAR_ALL"
+CallNative "UNK_215ABBE8" 2 1
+drop
+CallNative "UNK_02DBF2D7" 0 0
+
+StaticGet1 12
+PushString "SET_MAX_WIDTH"
+CallNative "UNK_215ABBE8" 2 1
+drop
+fPush 100
+CallNative "UNK_9A01FFDA" 1 0
+CallNative "UNK_02DBF2D7" 0 0
+
+push_0
+setF1 3
+
+StaticGet1 46
+Add1 1
+setF1 4
+
+:Label_menu_draw_frontend_while
+getF1 3
+getF1 4
+JumpGE @Label_menu_draw_frontend_end_while
+
+StaticGet1 12
+PushString "SET_DATA_SLOT"
+CallNative "UNK_215ABBE8" 2 1
+drop
+getF1 3
+CallNative "UNK_716777CB" 1 0
+getF1 3
+pstatic1 47
+ArrayGet1 1
+CallNative "UNK_716777CB" 1 0
+
+getF1 3
+pstatic1 54
+ArrayGet1 1
+CallNative "does_text_label_exist" 1 1
+JumpFalse @Label_menu_draw_frontend_string
+
+getF1 3
+pstatic1 54
+ArrayGet1 1
+CallNative "clear_player_has_2_characters_enable" 1 0
+Jump @Label_menu_draw_frontend_gxt
+
+:Label_menu_draw_frontend_string
+PushString "STRING"
+CallNative "clear_player_has_2_characters_enable" 1 0
+getF1 3
+pstatic1 54
+ArrayGet1 1
+CallNative "UNK_27A244D8" 1 0
+
+:Label_menu_draw_frontend_gxt
+push_-1
+CallNative "add_text_component_integer" 1 0
+CallNative "UNK_386CE0B8" 0 0
+CallNative "UNK_02DBF2D7" 0 0
+
+getF1 3
+Add1 1
+setF1 3
+Jump @Label_menu_draw_frontend_while
+
+:Label_menu_draw_frontend_end_while
+Call @menu_draw_frontend_hook
+StaticGet1 12
+PushString "SET_BACKGROUND_COLOUR"
+CallNative "UNK_215ABBE8" 2 1
+drop
+push_0
+CallNative "UNK_716777CB" 1 0
+push_0
+CallNative "UNK_716777CB" 1 0
+push_0
+CallNative "UNK_716777CB" 1 0
+Push1 80
+CallNative "UNK_716777CB" 1 0
+CallNative "UNK_02DBF2D7" 0 0
+
+StaticGet1 12
+PushString "DRAW_INSTRUCTIONAL_BUTTONS"
+CallNative "UNK_215ABBE8" 2 1
+drop
+push_0
+CallNative "UNK_716777CB" 1 0
+CallNative "UNK_02DBF2D7" 0 0
+
+Push2 76 66
+CallNative "UNK_228A2598" 2 0
+fPush_0.0
+fPush_0.0
+fPush_0.0
+fPush_0.0
+CallNative "UNK_76C641E4" 4 0
+CallNative "UNK_3FE33BD6" 0 0
+
+StaticGet1 12
+Push3 255 255 255
+Push1 255
+CallNative "UNK_7B48E696" 5 0
+
+:Label_draw_frontend_loaded
+Jump @Label_draw_frontend_end
+
+:Label_draw_frontend_not_loaded
+PushString "instructional_buttons"
+CallNative "request_scaleform_movie" 1 1
+StaticSet1 12
+push_1
+StaticSet1 13
+
+:Label_draw_frontend_end
+Return 0 0
+
+:menu_draw
+Function 0 35 0
+
+push_0
+setF1 3
+
+StaticGet1 20
+setF1 4
+
+getF1 4
+setF1 5
+
+fPush 0.05
+setF1 6
+
+getF1 6
+setF1 7
+
+StaticGet1 22
+setF1 8
+
+Call @menu_get_count
+Add1 1
+setF1 9
+
+StaticGet2 430
+setF1 10
+
+StaticGet2 431
+setF1 11
+
+push_1
+pFrame1 12
+pFrame1 13
+pFrame1 14
+pFrame1 21
+CallNative "get_hud_colour" 5 0
+
+pFrame1 22
+pFrame1 23
+CallNative "get_screen_resolution" 2 0
+
+push_0
+setF1 15
+
+push_0
+setF1 16
+
+push_0
+setF1 17
+
+StaticGet2 433
+fPush_0.0
+fPush 0.35
+getF1 12
+getF1 13
+getF1 14
+fPush_1.0
+push_0
+push_0
+Call @set_up_draw
+StaticGet1 10
+StaticGet1 3
+fPush 0.05416665
+Call @draw_string
+
+Call @menu_get_count
+StaticGet1 24
+JumpLE @Label_draw_menu_LOOP
+StaticGet2 433
+fPush_0.0
+fPush 0.35
+getF1 12
+getF1 13
+getF1 14
+StaticGet1 3
+fPush 0.215625
+fAdd
+push_1
+push_0
+Call @set_up_draw
+Call @menu_get_current_item
+Add1 1
+Call @menu_get_count
+Add1 1
+fPush_0.0
+fPush 0.05416665
+Call @draw_item_count
+
+:Label_draw_menu_LOOP
+getF1 3
+getF1 9
+JumpGE @Label_draw_menu_END
+
+getF1 5
+getF1 8
+fAdd
+setF1 5
+
+getF1 3
+StaticGet1 23
+JumpGT @Label_draw_menu_bool_end
+getF1 5
+StaticGet1 21
+fPush 0.0100
+fAdd
+JumpLE @Label_draw_menu_bool_end
+
+
+getF1 12
+setF1 18
+getF1 13
+setF1 19
+getF1 14
+setF1 20
+
+getF1 7
+getF1 8
+fAdd
+setF1 7
+
+:Label_draw_menu_1
+getF1 3
+Call @menu_get_current_item
+JumpNE @Label_draw_menu_2
+StaticGet1 3
+fPush 0.0046875
+fSub
+getF1 7
+fPush 0.225
+getF1 8
+Push1 240
+Push1 240
+Push1 240
+Push1 255
+Call @draw_rect
+getF1 15
+setF1 18
+getF1 16
+setF1 19
+getF1 17
+setF1 20
+
+:Label_draw_menu_2
+StaticGet2 433
+fPush_0.0
+fPush 0.35
+getF1 18
+getF1 19
+getF1 20
+fPush_1.0
+push_0
+push_0
+Call @set_up_draw
+getF1 3
+pstatic1 72
+ArrayGet1 1
+StaticGet1 3
+getF1 5
+Call @draw_string
+
+push_3
+getF1 3
+pstatic1 123
+ArrayGet1 1
+JumpNE @Label_draw_menu_bool_end
+StaticGet2 433
+fPush_0.0
+fPush 0.35
+getF1 18
+getF1 19
+getF1 20
+StaticGet1 3
+fPush 0.203125
+fAdd
+push_1
+push_0
+Call @set_up_draw
+
+getF1 3
+pstatic1 174
+ArrayGet1 1
+Not
+JumpFalse @Label_draw_menu_bool_true
+getF1 10
+fPush_0.0
+getF1 5
+Call @draw_string
+Jump @Label_draw_menu_bool_end
+
+:Label_draw_menu_bool_true
+getF1 11
+fPush_0.0
+getF1 5
+Call @draw_string
+
+:Label_draw_menu_bool_end
+getF1 3
+Add1 1
+setF1 3
+Jump @Label_draw_menu_LOOP
+
+:Label_draw_menu_END
+StaticGet1 27
+JumpFalse @Label_draw_menu_draw_sprite_end
+Call @menu_get_count
+StaticGet1 24
+JumpLE @Label_draw_menu_draw_sprite_end
+
+push_1
+pFrame1 24
+pFrame1 25
+pFrame1 26
+pFrame1 27
+CallNative "get_hud_colour" 5 0
+
+StaticGet1 24
+Add1 2
+setF1 33
+
+StaticGet1 22
+getF1 33
+ItoF
+fMul
+setF1 34
+
+PushString "CommonMenu"
+PushString "shop_arrows_upANDdown"
+CallNative "get_texture_resolution" 2 3
+push_3
+pFrame1 29
+FromStack
+
+PushString "CommonMenu"
+PushString "shop_arrows_upANDdown"
+StaticGet1 3
+fPush 0.0046875
+fSub
+fPush 0.225
+fPush 0.5
+fMul
+fAdd
+getF1 34
+fPush 0.04999922
+fAdd
+StaticGet1 22
+fPush 0.5
+fMul
+fAdd
+getF1 29
+getF1 22
+ItoF
+fDiv
+pFrame1 29
+GetImmediate1 1
+getF1 23
+ItoF
+fDiv
+fPush_0.0
+getF1 24
+getF1 25
+getF1 26
+getF1 27
+CallNative "draw_sprite" 11 0
+
+:Label_draw_menu_draw_sprite_end
+Return 0 0
+
+:draw_item_count
+Function 4 4 0
+PushString "CM_ITEM_COUNT"
+CallNative "UNK_3E35563E" 1 0
+getF1 0
+CallNative "add_text_component_integer" 1 0
+getF1 1
+CallNative "add_text_component_integer" 1 0
+getF1 2
+getF1 3
+CallNative "UNK_6F8350CE" 2 0
+Return 4 0
+
+:draw_string
+Function 3 3 0
+
+getF1 0
+CallNative "does_text_label_exist" 1 1
+JumpFalse @Label_draw_string_1
+getF1 0
+CallNative "UNK_3E35563E" 1 0
+Jump @Label_draw_string_2
+
+:Label_draw_string_1
+PushString "STRING"
+CallNative "UNK_3E35563E" 1 0
+
+getF1 0
+CallNative "UNK_27A244D8" 1 0
+
+:Label_draw_string_2
+getF1 1
+getF1 2
+CallNative "UNK_6F8350CE" 2 0
+
+:Label_draw_string_end
+Return 3 0
+
+:set_up_draw
+Function 9 11 0
+getF1 0
+CallNative "set_text_font" 1 0
+getF1 1
+getF1 2
+CallNative "set_text_scale" 2 0
+
+getF1 3
+getF1 4
+getF1 5
+Push1 255
+CallNative "set_text_colour" 4 0
+
+fPush_0.0
+getF1 6
+CallNative "set_text_wrap" 2 0
+getF1 7
+CallNative "set_text_right_justify" 1 0
+
+getF1 8
+CallNative "set_text_centre" 1 0
+push_0
+push_0
+push_0
+push_0
+push_0
+CallNative "set_text_dropshadow" 5 0
+push_0
+push_0
+push_0
+push_0
+push_0
+CallNative "set_text_edge" 5 0
+Return 9 0
+
+:dummy_function
+Function 0 2 0
+
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+nop
+
+Return 0 0
