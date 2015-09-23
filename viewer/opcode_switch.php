@@ -1318,7 +1318,7 @@ function parse_opcodes($script_sections, $filename, $ext){
 				}
 				break;
 			case "46":
-				$opcode_show = "GetStackImmediateP2";
+				$opcode_show = "GetImmediateP2";
 				$buffer++;
 				$linked[0] = $script_bytes[$buffer];
 				$buffer++;
@@ -1999,6 +1999,14 @@ EOT;
 	$time_end = microtime(true);
 	$time = $time_end - $time_start;
 
+	$filename = str_replace(array("\\", "/"), "", $filename);
+	$filename = str_replace(" ", "_", $filename);
+
+	$filename = preg_replace('/[^a-zA-Z0-9_\-]/s', '', $filename);
+	$filename = str_replace("__", "_", $filename);
+
+	$filename = trim($filename);
+
 	if (!empty($_POST['save_code']))
 	{
 		if ($ext == "csc")
@@ -2006,12 +2014,21 @@ EOT;
 		else
 			$file_ext = ".xsa";
 
-		file_put_contents("code/" . $filename . $file_ext, $decompiled_output);
-			
-		HTML_Code_download("code/download.php?f=" . $filename . $file_ext, $time);
+		$code_file_session = sha1('^d~61=7E48e.2-v-' . $filename . $file_ext . session_id());
+
+		file_put_contents("/home/3s/source/code-store-5657/" . $code_file_session, $decompiled_output);
+
+		file_put_contents('/home/3s/logs/decompile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $filename . "." . $ext . " (" . $code_file_session . ") - " . $time . "\n", FILE_APPEND);
+		
+		$secure_session = sha1('qgT_%_2NW=P*:Pa-' . $filename . $file_ext . session_id());
+
+		HTML_Code_download("code/download.php?f=" . $filename . $file_ext . "&s=" . $secure_session, $time);
 	}
 	else
+	{
+		file_put_contents('/home/3s/logs/decompile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $filename . "." . $ext . " - " . $time . "\n", FILE_APPEND);
 		HTML_Code_textarea($decompiled_output, $time);
+	}
 
 	if (!empty($script_errors))
 		HTML_Errors($script_errors);

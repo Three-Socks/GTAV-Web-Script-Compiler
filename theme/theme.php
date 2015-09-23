@@ -1,8 +1,11 @@
 <?php
 
-function HTML_Start_Display()
+if (!defined('3Socks'))
+	die();
+
+function HTML_Start_Display($title, $title_more = '')
 {
-	global $installUrl;
+	global $installUrl, $themeUrl;
 
 	echo '<!DOCTYPE html>
 	<html lang="en">
@@ -10,21 +13,20 @@ function HTML_Start_Display()
 			<meta charset="utf-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
-			<meta name="description" content="">
+			<meta name="description" content="Three-Socks - GTAV CSC/XSC Stuff">
 			<meta name="author" content="">
 			<link rel="icon" href="favicon.ico">
 
-			<title>CSC/XSC Compiler</title>
+			<title>' . $title . '</title>
 
-			<link rel="icon" type="img/ico" href="' . $installUrl . '/favicon.ico">
+			<link rel="icon" type="img/ico" href="/favicon.ico">
 
 			<!-- Bootstrap core CSS -->
-			<link href="' . $installUrl . '/theme/bootstrap-dist/css/bootstrap.min.css" rel="stylesheet">
-			<!-- Bootstrap theme -->
-			<link href="' . $installUrl . '/theme/bootstrap-dist/css/bootstrap-theme.min.css" rel="stylesheet">
+			<link href="' . $themeUrl . '/bootstrap-dist/css_theme/bootstrap.css?2" rel="stylesheet">
+			<link href="' . $themeUrl . '/bootstrap-dist/css/bootstrap-colorpicker.min.css" rel="stylesheet">
 
 			<!-- Custom styles for this template -->
-			<link href="' . $installUrl . '/theme/theme.css" rel="stylesheet">
+			<link href="' . $themeUrl . '/theme.css?2" rel="stylesheet">
 			
 			<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 			<!--[if lt IE 9]>
@@ -34,8 +36,8 @@ function HTML_Start_Display()
 		</head>
 
 		<body role="document">
-			<!-- Fixed navbar -->
-			<nav class="navbar navbar-inverse navbar-fixed-top">
+			<!-- Fixed navbar navbar-default/navbar-inverse -->
+			<nav class="navbar navbar-default navbar-fixed-top">
 				<div class="container">
 					<div class="navbar-header">
 						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -44,11 +46,21 @@ function HTML_Start_Display()
 							<span class="icon-bar"></span>
 							<span class="icon-bar"></span>
 						</button>
-						<a class="navbar-brand" href="' . $installUrl . '/">CSC/XSC Decompiler/Compiler</a>
+						<a class="navbar-brand" href="' . $installUrl . '/">' . $title . $title_more . '</a>
 					</div>
 					<div id="navbar" class="navbar-collapse collapse">
 						<ul class="nav navbar-nav">
-							<li class="active"><a href="' . $installUrl . '/">Home</a></li>
+							<li><a href="/index.php">Code</a></li>
+							<li><a href="/PC-Trainer-V/">PC Trainer V</a></li>
+							<li class="dropdown">
+								<a class="dropdown-toggle" data-toggle="dropdown" href="#" id="console">Console Stuff <span class="caret"></span></a>
+								<ul class="dropdown-menu" aria-labelledby="console">
+									<!--<li><a href="/compiler/">Compiler</a></li>-->
+									<li><a href="/modmanager_maker/">ModManager Maker</a></li>
+									<li><a href="/hash/">Hasher</a></li>
+									<li><a href="/opcode_convert/">Opcode Convert</a></li>
+								</ul>
+							</li>
 						</ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -56,6 +68,20 @@ function HTML_Start_Display()
 
 			<div class="container" role="main">
 ';
+
+	echo '
+				<div class="row">
+					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+					<!-- 3socks -->
+					<ins class="adsbygoogle"
+						 style="display:block"
+						 data-ad-client="ca-pub-5592824295977689"
+						 data-ad-slot="6936185352"
+						 data-ad-format="auto"></ins>
+					<script>
+					(adsbygoogle = window.adsbygoogle || []).push({});
+					</script>
+				</div>';
 
 }
 
@@ -80,7 +106,7 @@ function HTML_Script_Info_Section($HeaderValues)
 					<div class="col-sm-3">
 						<dl class="dl-horizontal">
 							<dt>Magic</dt>
-							<dd>' .  bin2hex($HeaderValues['magic']) . '</dd>
+							<dd>' .  strtoupper(bin2hex($HeaderValues['magic'])) . '</dd>
 						</dl>
 					</div><!-- /.col-sm-3 -->
 
@@ -166,6 +192,10 @@ function HTML_Script_Info_Section($HeaderValues)
 
 function HTML_Upload_Section($html_return)
 {
+	global $maxDecompileSize;
+
+	$save_code = isset($_POST['save_code']) ? $_POST['save_code'] : 1;
+	
 	echo '
 			<div class="col-md-5">
 				<div class="page-header">
@@ -175,12 +205,13 @@ function HTML_Upload_Section($html_return)
 					<div class="form-group">
 						<div style="float:left;width:49%;">
 							<label for="upload_script">Script input</label>
-							<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
+							<input type="hidden" name="MAX_FILE_SIZE" value="' . $maxDecompileSize . '" />
 							<input type="file" id="upload_script" name="upload_script">
-							<p class="help-block">*.csc, *xsc</p>
+							<p class="help-block">*.csc, *.xsc</p>
+							<p class="help-block">Max script size: ' . round($maxDecompileSize / 1024, 1) . ' KB</p>
 							<div class="checkbox">
 								<label for="save_code">
-								<input type="checkbox" id="save_code" name="save_code" value="1">
+								<input type="checkbox" id="save_code" name="save_code" value="1"', $save_code ? ' checked' : '', '>
 										Save the decompiled code instead of outputting.
 								</label>
 							</div>
@@ -206,9 +237,9 @@ function HTML_Upload_Section($html_return)
 				<form action="" method="post" enctype="multipart/form-data">
 					<div class="form-group">
 						<label for="upload_script_statics">Script input</label>
-						<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
+						<input type="hidden" name="MAX_FILE_SIZE" value="' . $maxDecompileSize . '" />
 						<input type="file" id="upload_script_statics" name="upload_script_statics">
-						<p class="help-block">*.csc, *xsc</p>
+						<p class="help-block">*.csc, *.xsc</p>
 						<br />
 						<button type="submit" class="btn btn-default">Edit</button>
 						<br />
@@ -231,15 +262,13 @@ function HTML_Upload_Section($html_return)
 					<div class="form-group">
 						<div style="float:left;width:49%;">
 							<label for="upload_script_template">Script static template input</label>
-							<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
 							<input type="file" id="upload_script_template" name="upload_script_template">
-							<p class="help-block">*.csc, *xsc</p>
+							<p class="help-block">*.csc, *.xsc</p>
 						</div>
 						<div style="float:right;width:49%;">
 							<label for="upload_code">Code input</label>
-							<input type="hidden" name="MAX_FILE_SIZE" value="5242880" />
 							<input type="file" id="upload_code" name="upload_code">
-							<p class="help-block">*.csa, *xsa</p>
+							<p class="help-block">*.csa, *.xsa</p>
 						</div>
 						<div class="clearfix"></div>
 						<br />
@@ -256,6 +285,398 @@ function HTML_Upload_Section($html_return)
 			</div>
 ';
 
+}
+
+function HTML_Hash_Section($html_return, $button_ids)
+{
+	global $installUrl;
+
+	$text = isset($_POST['string_to_hash']) ? trim($_POST['string_to_hash']) : '';
+	
+	echo '
+			<div class="row">
+				<form action="" class="form-inline" method="post">
+					<div class="col-lg-6">
+						<div class="page-header">
+							<h1>Joaat Hasher</h1>
+						</div>
+						<div class="form-group">
+							<label for="string_to_hash">String</label>
+							<input size="36" type="text" class="form-control" id="string_to_hash" name="string_to_hash" value="', htmlspecialchars($text, ENT_QUOTES, 'UTF-8'), '">
+							<button type="submit" class="btn btn-default">Hash</button>
+						</div>
+						<br />
+						<br />';
+
+						if (empty($_POST['cheat_combo_ids']) && !empty($html_return))
+							echo $html_return;
+
+						echo '
+					</div>
+					<div class="col-lg-6">
+						<div class="page-header">
+							<h1>Cheat Combo Hasher</h1>
+						</div>
+						<div id="cheat_combo_buttons" class="text-center btn-toolbar" style="float: none;">
+							<div class="btn-group" style="float: none;">
+								<button button_id="1" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_1.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="2" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_2.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="3" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_3.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="4" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_4.png" alt="" style="width:32px;" />
+								</button>
+							</div>
+							<div class="btn-group" style="float: none;">
+								<button button_id="5" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_5.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="6" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_6.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="7" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_7.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="8" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_8.png" alt="" style="width:32px;" />
+								</button>
+							</div>
+							<div class="btn-group" style="float: none;margin-top:5px;">
+								<button button_id="9" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_9.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="10" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_10.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="11" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_11.png" alt="" style="width:32px;" />
+								</button>
+								<button button_id="12" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_12.png" alt="" style="width:32px;" />
+								</button>
+							</div>
+						</div>
+
+						<div class="text-center" style="margin-top: 20px;">
+							<input id="cheat_combo_ids" type="hidden" name="cheat_combo_ids" value="', !empty($_POST['cheat_combo_ids']) ? htmlspecialchars($_POST['cheat_combo_ids'], ENT_QUOTES, 'UTF-8') : '0', '">
+							<button id="cheat_combo_clear" type="button" class="btn btn-default">Clear</button>
+							<button type="submit" class="btn btn-default">Submit</button>
+						</div>
+						
+						<div id="cheat_combo" class="btn-toolbar" style="', !empty($button_ids) ? '' : 'display:none;', 'margin-top:20px;">';
+						if (!empty($_POST['cheat_combo_ids']) && !empty($html_return))
+							echo '<div id="html_return">' . $html_return . '</div>';
+						
+						echo '
+						<br />
+						<p>Cheat Combo</p>
+							<div class="btn-group">';
+
+	if (!empty($button_ids))
+	{
+		foreach($button_ids as $button)
+			echo '
+								<a button_id="' . $button . '" href="#" class="btn btn-default">
+									<img src="' . $installUrl . '/buttons/button_' . $button . '.png" alt="" style="width:16px;" />
+								</a>';
+			
+	}
+							
+	echo '
+							</div>
+						</div>
+						
+					</div>
+				</form>
+			</div>';
+
+}
+
+function HTML_ModManger_Maker_Section($modmanager_scripts, $html_return)
+{
+	$script_exist = isset($_POST['script_exist']) ? 1 : 0;
+	$platform = !empty($_POST['platform']) ? $_POST['platform'] : '';
+	$custom_bool_off = !empty($_POST['custom_bool_off']) ? filter_var($_POST['custom_bool_off'], FILTER_SANITIZE_STRING) : '';
+	$custom_bool_on = !empty($_POST['custom_bool_on']) ? filter_var($_POST['custom_bool_on'], FILTER_SANITIZE_STRING) : 'Enabled';
+	$custom_font = !empty($_POST['custom_font']) ? (int) $_POST['custom_font'] : 0;
+	$menu_header = !empty($_POST['menu_header']) ? colourDataValidate($_POST['menu_header']) : '#000000';
+	$menu_window = !empty($_POST['menu_window']) ? colourDataValidate($_POST['menu_window']) : '#000000';
+	$menu_highlight_window = !empty($_POST['menu_highlight_window']) ? colourDataValidate($_POST['menu_highlight_window']) : '#f0f0f0';
+	$menu_header_text = !empty($_POST['menu_header_text']) ? colourDataValidate($_POST['menu_header_text']) : '#f0f0f0';
+	$menu_highlighted_text = !empty($_POST['menu_highlighted_text']) ? colourDataValidate($_POST['menu_highlighted_text']) : '#000000';
+	$menu_text = !empty($_POST['menu_text']) ? colourDataValidate($_POST['menu_text']) : '#f0f0f0';
+	$menu_pos = !empty($_POST['menu_pos']) ? (int) $_POST['menu_pos'] : 0;
+	$menu_sfx = !empty($_POST['menu_sfx']) ? (int) $_POST['menu_sfx'] : 1;
+
+	echo '
+			<div class="row">
+				<div class="page-header">
+					<h1>ModManager Maker</h1>
+				</div>
+				<form action="" id="modmanager_form" class="form-inline" method="post">
+				<div class="col-md-6">';
+					/*<div class="row" style="margin-bottom: 10px;">
+						<div class="col-xs-6">
+							<button type="submit" class="btn btn-default">Submit</button>
+						</div>
+						
+						<div class="col-xs-6">
+							<input id="modmanager_add" class="btn btn-default" type="button" value="Add">
+							<input id="modmanager_delete" class="btn btn-default" type="button" value="Delete">
+						</div>
+					</div>*/
+					echo '<div class="row">
+						<div class="col-xs-6">
+							(Close on load) &nbsp; Display Name
+						</div>
+						<div class="col-xs-6">
+							Script
+						</div>
+					</div>';
+
+	foreach ($modmanager_scripts as $key => $modmanager)
+	{
+		$modmanager_item_menu = isset($modmanager['menu']) && $modmanager['menu'] == 1 ? 1 : 0;
+
+		echo '
+					<div class="row" id="modmanager_item_div_' . $key . '">
+					<div class="col-xs-6" style="margin: 8px 0;">
+						<div class="input-group">
+							<span class="input-group-addon">
+								<input id="modmanager_item_menu_' . $key . '_h" name="modmanager_item_menu_' . $key . '" type="hidden">
+								<input id="modmanager_item_menu_' . $key . '" name="modmanager_item_menu_' . $key . '" type="checkbox"', $modmanager_item_menu ? ' checked': '', '>
+							</span>
+							<input type="text" class="form-control" size="35" name="modmanager_item[]" id="modmanager_item_' . $key . '" value="' . $modmanager['name'] . '" maxlength="60">
+						</div>
+					</div>
+
+					<div class="col-xs-6" style="margin: 8px 0;">				
+						<div class="input-group">
+							<input type="text" class="form-control" name="modmanager_item_script[]" id="modmanager_item_script_' . $key . '" value="' . $modmanager['script'] . '" maxlength="60" spellcheck="false">
+						</div>
+					</div>
+					</div>';
+	}
+
+	echo '
+					<div id="modmanager_items"></div>
+
+					<div class="row" style="margin-top: 10px;">
+						<div class="col-xs-6">
+							<input type="hidden" name="modmanager_maker">
+							<button type="submit" class="btn btn-default">Submit</button>
+							<!--<input id="modmanager_save" class="btn btn-default" type="button" value="Save">-->
+						</div>
+						
+						<div class="col-xs-6">
+							<input id="modmanager_add_2" class="btn btn-default" type="button" value="Add">
+							<input id="modmanager_delete_2" class="btn btn-default" type="button" value="Delete">
+						</div>
+					</div>
+					</div>
+					<div class="col-md-6" style="padding-left:35px;">
+						<div class="row">
+						<p>ModManager Maker for GTAV (PS3/360). Enter the display name and script to load into the text boxes and press submit to compile into a script.</p>
+						<p>Select the checkbox next to the display name to make ModManager close when the script is loaded.</p>
+						<p>To open ModManager: L3+R3 (PS3) / LS+RS (360) .</p>
+						<h1>Options</h1>
+							<div class="checkbox">
+								<label for="script_exist">
+								<input type="checkbox" id="script_exist" name="script_exist" value="1"', $script_exist ? ' checked' : '', '>
+										&nbsp; Remove script exist checks.
+								</label>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="form-group">
+								<label for="custom_bool_off">Disabled string</label><br />
+								<input type="text" class="form-control" id="custom_bool_off" name="custom_bool_off" value="', $custom_bool_off, '">
+							</div>
+
+							<br />
+							<br />
+
+							<div class="form-group">
+								<label for="custom_bool_on">Enabled string</label><br />
+								<input type="text" class="form-control" id="custom_bool_on" name="custom_bool_on" value="', $custom_bool_on, '">
+							</div>
+
+							<br />
+							<br />
+
+							<div class="form-group">
+								<label for="custom_font">Font (0-7)</label><br />
+								<input type="number" min="0" max="7" class="form-control" id="custom_font" name="custom_font" value="', $custom_font, '">
+							</div>
+
+							<br />
+							<br />
+
+							<div class="input-group modmanager_menu_header">
+								<label for="menu_header">Menu Header Window</label><br />
+								<input type="text" id="menu_header" name="menu_header" value="', $menu_header, '" class="form-control" />
+								<span class="input-group-addon"><i></i></span>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="input-group modmanager_menu_window">
+								<label for="menu_window">Menu Items Window</label><br />
+								<input type="text" id="menu_window" name="menu_window" value="', $menu_window, '" class="form-control" />
+								<span class="input-group-addon"><i></i></span>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="input-group modmanager_menu_highlight_window">
+								<label for="menu_highlight_window">Menu Highlight Bar</label><br />
+								<input type="text" id="menu_highlight_window" name="menu_highlight_window" value="', $menu_highlight_window, '" class="form-control" />
+								<span class="input-group-addon"><i></i></span>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="input-group modmanager_menu_header_text">
+								<label for="menu_header_text">Menu Header Text</label><br />
+								<input type="text" id="menu_header_text" name="menu_header_text" value="', $menu_header_text, '" class="form-control" />
+								<span class="input-group-addon"><i></i></span>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="input-group modmanager_menu_highlighted_text">
+								<label for="menu_highlighted_text">Menu Highlighted Text</label><br />
+								<input type="text" id="menu_highlighted_text" name="menu_highlighted_text" value="', $menu_highlighted_text, '" class="form-control" />
+								<span class="input-group-addon"><i></i></span>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="input-group modmanager_menu_text">
+								<label for="menu_text">Menu Items Text</label><br />
+								<input type="text" id="menu_text" name="menu_text" value="', $menu_text, '" class="form-control" />
+								<span class="input-group-addon"><i></i></span>
+							</div>
+
+							<br />
+							<br />
+
+							<div class="form-group">
+								<label for="menu_pos">Menu Position</label><br />
+								<select class="form-control" id="menu_pos" name="menu_pos">
+									<option value="0"', $menu_pos == '0' ? ' selected' : '', '>Left</option>
+									<option value="1"', $menu_pos == '1' ? ' selected' : '', '>Right</option>
+								</select>										 
+							</div>
+
+							<br />
+							<br />
+
+							<div class="form-group">
+								<label for="menu_sfx">Menu Sound Effects</label><br />
+								<select class="form-control" id="menu_sfx" name="menu_sfx">
+									<option value="0"', $menu_sfx == '0' ? ' selected' : '', '>Off</option>
+									<option value="1"', $menu_sfx == '1' ? ' selected' : '', '>On</option>
+								</select>										 
+							</div>
+
+							<br />
+							<br />
+
+							<div class="form-group">
+								<label for="platform">Platform</label><br />
+								<select class="form-control" id="platform" name="platform">
+									<option value="PS3"', $platform == 'PS3' ? ' selected' : '', '>PS3 (CSC)</option>
+									<option value="360"', $platform == '360' ? ' selected' : '', '>360 (XSC)</option>
+								</select>										 
+							</div>';
+
+	if (isset($_POST['modmanager_maker']) && !empty($html_return))
+		echo $html_return;
+
+	echo '
+					</div>
+					</div>
+
+				</form>';
+
+
+				
+	echo '
+			</div>';
+}
+
+function HTML_Convert_Section($html_return)
+{
+	$convert_format = isset($_POST['convert_format']) ? $_POST['convert_format'] : 'zorg';
+	$download_code = isset($_POST['download_code']) ? 1 : 0;
+
+	echo '
+			<div class="col-md-5">
+				<div class="page-header">
+					<h1>Convert</h1>
+				</div>
+				<form action="" method="post" enctype="multipart/form-data">
+					<div class="form-group">
+							<label for="upload_code">Code input</label>
+							<input type="file" id="upload_code" name="upload_code">
+							<p class="help-block">*.csa, *.xsa</p>
+							<div class="radio">
+								<label>
+									<input type="radio" name="convert_format" id="optionsRadios2" value="zorg"', $convert_format == "zorg" ? ' checked' : '', '>
+									Convert from zorgs format to web.
+								</label>
+							</div>
+							<div class="radio">
+								<label>
+									<input type="radio" name="convert_format" id="optionsRadios1" value="web"', $convert_format == "web" ? ' checked' : '', '>
+									Convert from web format to zorgs.
+								</label>
+							</div>
+							<div class="checkbox">
+								<label for="download_code">
+								<input type="checkbox" id="download_code" name="download_code" value="1"', $download_code ? ' checked' : '', '>
+										Download code.
+								</label>
+							</div>
+						<br />
+						<button type="submit" class="btn btn-default">Convert</button>
+						<br />
+						<br />
+					</div>
+				</form>
+			</div>';
+
+			if (isset($_FILES['upload_code']) && !empty($html_return))
+			{
+				echo '
+						<div class="col-md-5">
+							<div class="page-header">
+								<h1>Output</h1>
+							</div>';
+
+				echo '
+								<form>
+									<div class="form-group">
+										<textarea class="form-control" id="script_code" class="form-control" rows="3" onfocus="var inp=this;setTimeout(function(){inp.select();},10);">' . $html_return . '</textarea>
+										<br />
+										<p><button id="select-all-button" type="button" class="btn btn-primary" onfocus="var inp=document.getElementById(\'script_code\');setTimeout(function(){inp.select();},10);">Select All</button></p>
+									</div>
+								</form>
+							</div>';
+			}
 }
 
 function HTML_Code_Section($HeaderValues)
@@ -278,7 +699,7 @@ function HTML_Code_textarea($decompiled_output, $time)
 				<div class="row">
 					<form>
 						<div class="form-group">
-							<textarea id="script_code" class="form-control" rows="3" onfocus="var inp=this;setTimeout(function(){inp.select();},10);">' .$decompiled_output . '</textarea>
+							<textarea class="form-control" id="script_code" class="form-control" rows="3" onfocus="var inp=this;setTimeout(function(){inp.select();},10);">' .$decompiled_output . '</textarea>
 							<br />
 							<p><button id="select-all-button" type="button" class="btn btn-primary" onfocus="var inp=document.getElementById(\'script_code\');setTimeout(function(){inp.select();},10);">Select All</button></p>
 						</div>
@@ -321,7 +742,7 @@ function HTML_Native_Section($script_sections, $HeaderValues, $raw_natives_name,
 		<div class="page-header">
 			<h1>Natives - ' . $natives_count . '</h1>
 		</div>
-		<textarea rows="20" cols="40" spellcheck="false">';
+		<textarea class="form-control" rows="20" cols="40" spellcheck="false">';
 	
 	foreach ($text_natives_array as $native)
 		echo $native . "\n";
@@ -361,7 +782,7 @@ function HTML_String_Section($script_sections, $HeaderValues)
 		<div class="page-header">
 			<h1>Strings -  ' . $stringssize . ' <i>bytes</i></h1>
 		</div>
-		<textarea rows="20" cols="40" spellcheck="false">';
+		<textarea class="form-control" rows="20" cols="40" spellcheck="false">';
 
 	if ($string_sect == "No Strings Found In This Script"){ //This checks if string sect is null and just displays null text - yes, some scripts dont have string sections :?
 		echo $string_sect;
@@ -502,9 +923,9 @@ function HTML_Statics_Edit($statics_sect, $HeaderValues, $script_filename, $scri
 		</script>';
 }
 
-function HTML_End_Display()
+function HTML_End_Display($script_code = "")
 {
-	global $installUrl;
+	global $themeUrl;
 
 	echo '
     </div> <!-- /container -->
@@ -514,7 +935,11 @@ function HTML_End_Display()
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="' . $installUrl . '/theme/bootstrap-dist/js/bootstrap.min.js"></script>
+    <script src="' . $themeUrl . '/bootstrap-dist/js/bootstrap.min.js"></script>';
+		if (!empty($script_code))
+			echo $script_code;
+		
+		echo '
   </body>
 </html>';
 }
