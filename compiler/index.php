@@ -4,27 +4,15 @@
 
 error_reporting(E_ALL ^ E_STRICT);
 
-ini_set('display_errors', 'Off'); 
-ini_set('log_errors', 'On'); 
-ini_set('error_log', '/home/3s/logs/php_errors.txt'); 
+//ini_set('display_errors', 'Off'); 
 
 define('3Socks', true);
 
 global $return_html;
 
-if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-	$protocol = 'https://';
-else
-	$protocol = 'http://';
+require('../config.php');
 
-$installUrl = $protocol . '3socks.cf/compiler';
-
-$themeUrl = $protocol . '3socks.cf/theme';
-
-$sourceDir = '/home/3s/source/';
-$themeDir = '/home/3s/public_html/theme/';
-
-include($sourceDir . 'digest.php');
+//include($sourceDir . 'digest.php');
 
 $maxDecompileSize = 204816;
 
@@ -167,7 +155,7 @@ else if (isset($_FILES['upload_code'])
 }*/
 
 
-	HTML_Start_Display('CSC/XSC Decompiler/Compiler', ' <span style="font-size:12px;">for GTAV update 1.23</span>');
+	HTML_Start_Display('CSC/XSC Decompiler/Compiler', ' <span style="font-size:12px;">for GTAV</span>');
 
 
 	HTML_Upload_Section($return_html);

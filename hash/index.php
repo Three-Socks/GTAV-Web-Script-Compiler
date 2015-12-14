@@ -2,25 +2,13 @@
 
 error_reporting(E_ALL ^ E_STRICT);
 
-ini_set('display_errors', 'Off'); 
-ini_set('log_errors', 'On'); 
-ini_set('error_log', '/home/3s/logs/php_errors.txt'); 
+//ini_set('display_errors', 'Off'); 
+
+require('../config.php');
 
 define('3Socks', true);
 
 global $return_html;
-
-if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-	$protocol = 'https://';
-else
-	$protocol = 'http://';
-
-$installUrl = $protocol . '3socks.cf/hash';
-
-$themeUrl = $protocol . '3socks.cf/theme';
-
-$sourceDir = '/home/3s/source/';
-$themeDir = '/home/3s/public_html/theme/';
 
 $script_output = '';
 
@@ -124,7 +112,7 @@ HTML_End_Display('
 					event.preventDefault();
 					$("#cheat_combo").css("display", "block");
 					var button_id = $(this).attr("button_id");
-					$("#cheat_combo > .btn-group").append(\'<a button_id="\' + button_id + \'" href="#" class="btn btn-default"><img src="' . $installUrl . '/buttons/button_\' + button_id + \'.png" alt="" style="width:16px;" /></a>\');
+					$("#cheat_combo > .btn-group").append(\'<a button_id="\' + button_id + \'" href="#" class="btn btn-default"><img src="' . $installUrl . '/hash/buttons/button_\' + button_id + \'.png" alt="" style="width:16px;" /></a>\');
 					
 					var cheat_combo_ids_val = $("#cheat_combo_ids").val();
 					$("#cheat_combo_ids").val(cheat_combo_ids_val + "_" + button_id);

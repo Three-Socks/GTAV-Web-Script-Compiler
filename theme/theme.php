@@ -13,7 +13,7 @@ function HTML_Start_Display($title, $title_more = '')
 			<meta charset="utf-8">
 			<meta http-equiv="X-UA-Compatible" content="IE=edge">
 			<meta name="viewport" content="width=device-width, initial-scale=1">
-			<meta name="description" content="Three-Socks - GTAV CSC/XSC Stuff">
+			<meta name="description" content="GTAV CSC/XSC">
 			<meta name="author" content="">
 			<link rel="icon" href="favicon.ico">
 
@@ -50,17 +50,11 @@ function HTML_Start_Display($title, $title_more = '')
 					</div>
 					<div id="navbar" class="navbar-collapse collapse">
 						<ul class="nav navbar-nav">
-							<li><a href="/index.php">Code</a></li>
-							<li><a href="/PC-Trainer-V/">PC Trainer V</a></li>
-							<li class="dropdown">
-								<a class="dropdown-toggle" data-toggle="dropdown" href="#" id="console">Console Stuff <span class="caret"></span></a>
-								<ul class="dropdown-menu" aria-labelledby="console">
-									<!--<li><a href="/compiler/">Compiler</a></li>-->
-									<li><a href="/modmanager_maker/">ModManager Maker</a></li>
-									<li><a href="/hash/">Hasher</a></li>
-									<li><a href="/opcode_convert/">Opcode Convert</a></li>
-								</ul>
-							</li>
+							<li><a href="' . $installUrl . '/index.php">Code</a></li>
+							<li><a href="' . $installUrl . '/compiler/">Compiler</a></li>
+							<li><a href="' . $installUrl . '/modmanager_maker/">ModManager Maker</a></li>
+							<li><a href="' . $installUrl . '/hash/">Hasher</a></li>
+							<li><a href="' . $installUrl . '/opcode_convert/">Opcode Convert</a></li>
 						</ul>
 					</div><!--/.nav-collapse -->
 				</div>
@@ -68,21 +62,6 @@ function HTML_Start_Display($title, $title_more = '')
 
 			<div class="container" role="main">
 ';
-
-	echo '
-				<div class="row">
-					<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-					<!-- 3socks -->
-					<ins class="adsbygoogle"
-						 style="display:block"
-						 data-ad-client="ca-pub-5592824295977689"
-						 data-ad-slot="6936185352"
-						 data-ad-format="auto"></ins>
-					<script>
-					(adsbygoogle = window.adsbygoogle || []).push({});
-					</script>
-				</div>';
-
 }
 
 function HTML_Script_Info_Section($HeaderValues)
@@ -320,44 +299,44 @@ function HTML_Hash_Section($html_return, $button_ids)
 						<div id="cheat_combo_buttons" class="text-center btn-toolbar" style="float: none;">
 							<div class="btn-group" style="float: none;">
 								<button button_id="1" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_1.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_1.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="2" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_2.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash//buttons/button_2.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="3" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_3.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash//buttons/button_3.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="4" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_4.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash//buttons/button_4.png" alt="" style="width:32px;" />
 								</button>
 							</div>
 							<div class="btn-group" style="float: none;">
 								<button button_id="5" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_5.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_5.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="6" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_6.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_6.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="7" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_7.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_7.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="8" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_8.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_8.png" alt="" style="width:32px;" />
 								</button>
 							</div>
 							<div class="btn-group" style="float: none;margin-top:5px;">
 								<button button_id="9" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_9.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_9.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="10" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_10.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_10.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="11" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_11.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_11.png" alt="" style="width:32px;" />
 								</button>
 								<button button_id="12" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_12.png" alt="" style="width:32px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_12.png" alt="" style="width:32px;" />
 								</button>
 							</div>
 						</div>
@@ -382,7 +361,7 @@ function HTML_Hash_Section($html_return, $button_ids)
 		foreach($button_ids as $button)
 			echo '
 								<a button_id="' . $button . '" href="#" class="btn btn-default">
-									<img src="' . $installUrl . '/buttons/button_' . $button . '.png" alt="" style="width:16px;" />
+									<img src="' . $installUrl . '/hash/buttons/button_' . $button . '.png" alt="" style="width:16px;" />
 								</a>';
 			
 	}
