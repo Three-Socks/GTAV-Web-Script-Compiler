@@ -4,9 +4,9 @@
 
 error_reporting(E_ALL ^ E_STRICT);
 
-ini_set('display_errors', 'Off'); 
-ini_set('log_errors', 'On'); 
-ini_set('error_log', '/home/3s/logs/php_errors.txt'); 
+//ini_set('display_errors', 'Off'); 
+
+require('../config.php');
 
 define('3Socks', true);
 
@@ -38,18 +38,6 @@ function hex2rgb($hex)
 }
 
 global $return_html;
-
-if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-	$protocol = 'https://';
-else
-	$protocol = 'http://';
-
-$installUrl = $protocol . '3socks.cf/modmanager_maker';
-
-$themeUrl = $protocol . '3socks.cf/theme';
-
-$sourceDir = '/home/3s/source/';
-$themeDir = '/home/3s/public_html/theme/';
 
 $script_output = '';
 
@@ -141,7 +129,7 @@ if (isset($_POST['modmanager_maker']))
 
 			$statics_sect = array();
 
-			$xsc_template_hex = Get_XSC_Hex('/home/3s/source/modmanager/modmanager.csc');
+			$xsc_template_hex = Get_XSC_Hex($sourceDir . 'modmanager/modmanager.csc');
 
 			$header = GetHeader($xsc_template_hex);  //Get Header
 			$HeaderValues = GetHeaderValues($header, $xsc_template_hex);
@@ -153,7 +141,7 @@ if (isset($_POST['modmanager_maker']))
 					$statics_sect[$i] = '00000000';
 			}
 
-			$raw_code = file_get_contents('/home/3s/source/modmanager/modmanager.csa');
+			$raw_code = file_get_contents($sourceDir . 'modmanager/modmanager.csa');
 
 			$script_code = "";
 
@@ -260,7 +248,7 @@ Call @modmanager_addItem_script";
 	}
 }
 
-	HTML_Start_Display('GTAV ModManager Maker 1.1', ' <span style="font-size:12px;">for GTAV update 1.23</span>');
+	HTML_Start_Display('GTAV ModManager Maker 1.1', ' <span style="font-size:12px;">for GTAV</span>');
 
 	HTML_ModManger_Maker_Section($modmanager_scripts, $return_html);
 

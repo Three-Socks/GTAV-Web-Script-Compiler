@@ -4,11 +4,11 @@
 
 error_reporting(E_ALL ^ E_STRICT);
 
-ini_set('display_errors', 'Off'); 
-ini_set('log_errors', 'On'); 
-ini_set('error_log', '/home/3s/logs/php_errors.txt'); 
+//ini_set('display_errors', 'Off'); 
 
 define('3Socks', true);
+
+require(dirname(__FILE__) . '/config.php');
 
 global $return_html;
 
@@ -44,18 +44,6 @@ function HTML_Home($repos)
 			</div>';
 }
 
-if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-	$protocol = 'https://';
-else
-	$protocol = 'http://';
-
-$installUrl = $protocol . '3socks.cf';
-
-$themeUrl = $protocol . '3socks.cf/theme';
-
-$sourceDir = '/home/3s/source/';
-$themeDir = '/home/3s/public_html/theme/';
-
 $script_output = '';
 
 include $themeDir . 'theme.php';
@@ -72,7 +60,7 @@ $repos = array(
 	),
 );
 
-HTML_Start_Display('Three-Socks - GTAV');
+HTML_Start_Display('GTAV');
 
 HTML_Home($repos);
 

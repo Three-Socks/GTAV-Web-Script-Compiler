@@ -2014,19 +2014,21 @@ EOT;
 		else
 			$file_ext = ".xsa";
 
-		$code_file_session = sha1('^d~61=7E48e.2-v-' . $filename . $file_ext . session_id());
+		require('../config.php');
 
-		file_put_contents("/home/3s/source/code-store-5657/" . $code_file_session, $decompiled_output);
+		$code_file_session = sha1($secretKey1 . $filename . $file_ext . session_id());
 
-		file_put_contents('/home/3s/logs/decompile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $filename . "." . $ext . " (" . $code_file_session . ") - " . $time . "\n", FILE_APPEND);
+		file_put_contents($sourceDir . 'code/' . $code_file_session, $decompiled_output);
+
+		//file_put_contents($sourceDir . 'logs/decompile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $filename . "." . $ext . " (" . $code_file_session . ") - " . $time . "\n", FILE_APPEND);
 		
-		$secure_session = sha1('qgT_%_2NW=P*:Pa-' . $filename . $file_ext . session_id());
+		$secure_session = sha1($secretKey2 . $filename . $file_ext . session_id());
 
-		HTML_Code_download("code/download.php?f=" . $filename . $file_ext . "&s=" . $secure_session, $time);
+		HTML_Code_download($installUrl . "/code/download.php?f=" . $filename . $file_ext . "&s=" . $secure_session, $time);
 	}
 	else
 	{
-		file_put_contents('/home/3s/logs/decompile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $filename . "." . $ext . " - " . $time . "\n", FILE_APPEND);
+		//file_put_contents($sourceDir . 'logs/decompile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $filename . "." . $ext . " - " . $time . "\n", FILE_APPEND);
 		HTML_Code_textarea($decompiled_output, $time);
 	}
 

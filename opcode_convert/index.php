@@ -4,23 +4,11 @@
 
 error_reporting(E_ALL ^ E_STRICT);
 
-ini_set('display_errors', 'Off'); 
-ini_set('log_errors', 'On');
-ini_set('error_log', '/home/3s/logs/php_errors.txt'); 
+//ini_set('display_errors', 'Off'); 
 
 define('3Socks', true);
 
-if (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
-	$protocol = 'https://';
-else
-	$protocol = 'http://';
-
-$installUrl = $protocol . '3socks.cf/opcode_convert';
-
-$themeUrl = $protocol . '3socks.cf/theme';
-
-$sourceDir = '/home/3s/source/';
-$themeDir = '/home/3s/public_html/theme/';
+require('../config.php');
 
 $script_output = '';
 

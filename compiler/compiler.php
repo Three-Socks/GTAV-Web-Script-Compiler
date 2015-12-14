@@ -3,9 +3,11 @@
 gc_enable(); //enable garbage collection (free up memory)
 //set_time_limit(0);
 
+require('../config.php');
+
 include 'compiler_functions.php';
 include 'gen_comp_functions.php';
-include '/home/3s/source/viewer/viewer_functions.php';
+include $sourceDir . 'viewer/viewer_functions.php';
 
 function Main_compile($uploadfile, $uploadfile_template, $ext)
 {

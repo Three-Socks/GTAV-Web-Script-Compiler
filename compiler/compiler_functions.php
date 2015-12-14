@@ -1065,7 +1065,8 @@ function parse_code($code_lines, $static_sect, $xsc_final_filename, $script_ext)
 		
 	if (empty($return_html))
 	{
-		file_put_contents('/home/3s/logs/compile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $xsc_final_filename . $file_ext . "\n", FILE_APPEND);
+		require('../config.php');
+		//file_put_contents($sourceDir . 'logs/compile.txt', date("d/m/y - G:i:s") . ' - ' . $_SERVER["REMOTE_ADDR"] . " - " . $xsc_final_filename . $file_ext . "\n", FILE_APPEND);
 		ob_clean();
 		
 		header('Content-Type: application/octet-stream');
